@@ -1,0 +1,10 @@
+# Backend
+webtourguide-api/target/
+webtourguide-api/*.iml
+webtourguide-api/.idea/
+webtourguide-api/application-local.properties
+
+# Frontend
+webtourguide-web/node_modules/
+webtourguide-web/dist/
+webtourguide-web/.env
