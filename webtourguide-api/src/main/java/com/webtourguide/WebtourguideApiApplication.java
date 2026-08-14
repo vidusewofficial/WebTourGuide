@@ -1,4 +1,4 @@
-package com.webtourguide.webtourguideapi;
+package com.webtourguide;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
