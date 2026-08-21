@@ -3,6 +3,7 @@ package com.webtourguide.config;
 import com.webtourguide.security.JwtAuthFilter;
 
 import org.springframework.context.annotation.*;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -31,6 +32,8 @@ public class SecurityConfig {
             throws Exception {
 
         http
+                .cors(Customizer.withDefaults())
+
                 .csrf(csrf -> csrf.disable())
 
                 .sessionManagement(sm ->
@@ -46,8 +49,11 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 org.springframework.http.HttpMethod.GET,
+                                "/api/destinations",
                                 "/api/destinations/**",
+                                "/api/packages",
                                 "/api/packages/**",
+                                "/api/guides",
                                 "/api/guides/**"
                         )
                         .permitAll()
