@@ -52,6 +52,7 @@ public class DestinationService {
                 .imageUrl(req.getImageUrl())
                 .latitude(req.getLatitude())
                 .longitude(req.getLongitude())
+                .galleryUrls(req.getGalleryUrls())
                 .createdBy(adminUserId)
                 .build();
 
@@ -69,6 +70,9 @@ public class DestinationService {
         d.setImageUrl(req.getImageUrl());
         d.setLatitude(req.getLatitude());
         d.setLongitude(req.getLongitude());
+        if (req.getGalleryUrls() != null) {
+            d.setGalleryUrls(req.getGalleryUrls());
+        }
 
         return toResponse(repository.save(d));
     }
@@ -105,6 +109,7 @@ public class DestinationService {
                 .imageUrl(d.getImageUrl())
                 .latitude(d.getLatitude())
                 .longitude(d.getLongitude())
+                .galleryUrls(d.getGalleryUrls())
                 .build();
     }
 }
