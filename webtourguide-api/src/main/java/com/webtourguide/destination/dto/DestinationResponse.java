@@ -21,4 +21,6 @@ public class DestinationResponse {
     private Double latitude;
 
     private Double longitude;
+
+    private java.util.List<String> galleryUrls;
 }
