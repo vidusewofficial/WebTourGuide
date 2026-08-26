@@ -3,8 +3,12 @@ webtourguide-api/target/
 webtourguide-api/*.iml
 webtourguide-api/.idea/
 webtourguide-api/application-local.properties
+webtourguide-api/uploads/
 
 # Frontend
 webtourguide-web/node_modules/
 webtourguide-web/dist/
 webtourguide-web/.env
+
+# Old static template
+tripbiz-v.01/
