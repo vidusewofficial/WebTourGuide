@@ -5,18 +5,31 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("user");
-    return saved ? JSON.parse(saved) : null;
+    try {
+      const saved = localStorage.getItem("user");
+      if (!saved || saved === "undefined" || saved === "null") {
+        return null;
+      }
+      return JSON.parse(saved);
+    } catch (e) {
+      console.warn("Could not parse user from localStorage:", e);
+      try {
+        localStorage.removeItem("user");
+      } catch (_) {}
+      return null;
+    }
   });
 
   async function login(email, password) {
     const res = await authApi.login({ email, password });
 
-    localStorage.setItem("token", res.token);
+    if (res?.token) {
+      localStorage.setItem("token", res.token);
+    }
 
     const userData = {
-      fullName: res.fullName,
-      role: res.role,
+      fullName: res.fullName || res.name || "User",
+      role: res.role || "TOURIST",
     };
 
     localStorage.setItem("user", JSON.stringify(userData));
@@ -24,8 +37,10 @@ export function AuthProvider({ children }) {
   }
 
   function logout() {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    } catch (_) {}
     setUser(null);
   }
 
@@ -36,4 +51,10 @@ export function AuthProvider({ children }) {
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    return { user: null, login: async () => {}, logout: () => {} };
+  }
+  return context;
+};
