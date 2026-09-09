@@ -138,7 +138,7 @@ export default function GuideEditForm() {
                 className="tripbiz-input"
                 value={form.yearsExperience}
                 onChange={handleChange}
-                min="0"
+                min="0" max="60"
                 max="60"
               />
             </div>
