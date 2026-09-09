@@ -55,18 +55,16 @@ export default function Navbar() {
                     Destinations
                   </Link>
                 </li>
-                {isAdminOrStaff && (
-                  <li className={`nav-item ${location.pathname === "/admin/destinations/new" ? "active" : ""}`}>
-                    <Link
-                      className="nav-link"
-                      to="/admin/destinations/new"
-                      onClick={() => setIsNavOpen(false)}
-                      style={{ color: "#f07b26", fontWeight: "600" }}
-                    >
-                      + Add Destination
-                    </Link>
-                  </li>
-                )}
+                <li className={`nav-item ${location.pathname.startsWith("/packages") ? "active" : ""}`}>
+                  <Link className="nav-link" to="/packages" onClick={() => setIsNavOpen(false)}>
+                    Packages
+                  </Link>
+                </li>
+                <li className={`nav-item ${location.pathname === "/services" ? "active" : ""}`}>
+                  <Link className="nav-link" to="/services" onClick={() => setIsNavOpen(false)}>
+                    Services
+                  </Link>
+                </li>
               </ul>
 
               <div className="d-flex align-items-center flex-wrap" style={{ gap: "10px" }}>
