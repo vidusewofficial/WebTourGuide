@@ -12,6 +12,10 @@ import Auth from "./pages/Auth";
 import DestinationList from "./pages/destinations/List";
 import DestinationDetail from "./pages/destinations/Detail";
 import DestinationAdminForm from "./pages/destinations/AdminForm";
+import PackageList from "./pages/packages/List";
+import PackageDetail from "./pages/packages/Detail";
+import PackageCompare from "./pages/packages/Compare";
+import PackageAdminForm from "./pages/packages/AdminForm";
 
 export default function App() {
   return (
@@ -24,13 +28,17 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/destinations" element={<DestinationList />} />
-            <Route path="/services" element={<Services />} />
             <Route path="/destinations/:id" element={<DestinationDetail />} />
+            <Route path="/packages" element={<PackageList />} />
+            <Route path="/packages/:id" element={<PackageDetail />} />
+            <Route path="/packages/compare" element={<PackageCompare />} />
+            <Route path="/services" element={<Services />} />
             <Route path="/login" element={<Auth />} />
             <Route path="/register" element={<Auth />} />
 
             <Route element={<ProtectedRoute allow={["ADMIN", "STAFF"]} />}>
               <Route path="/admin/destinations/new" element={<DestinationAdminForm />} />
+              <Route path="/admin/packages/new" element={<PackageAdminForm />} />
             </Route>
           </Routes>
         </main>
