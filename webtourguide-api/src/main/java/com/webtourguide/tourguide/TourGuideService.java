@@ -11,6 +11,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,7 @@ public class TourGuideService {
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    @Transactional
     public TourGuideResponse create(TourGuideCreateRequest req) {
         log.info("Creating guide profile for userId={}", req.getUserId());
         User user = userRepository.findById(req.getUserId())
@@ -70,6 +72,7 @@ public class TourGuideService {
         return saved;
     }
 
+    @Transactional
     public TourGuideResponse updateProfile(Long id, TourGuideUpdateRequest req, Authentication auth) {
         log.info("Updating profile for guide id={} by '{}'", id, auth.getName());
         TourGuide guide = findEntity(id);
@@ -81,6 +84,7 @@ public class TourGuideService {
         return toResponse(repository.save(guide));
     }
 
+    @Transactional
     public TourGuideResponse updateAvailability(Long id, AvailabilityUpdateRequest req, Authentication auth) {
         log.info("Updating availability for guide id={} to {} by '{}'", id, req.getIsAvailable(), auth.getName());
         TourGuide guide = findEntity(id);
@@ -89,6 +93,7 @@ public class TourGuideService {
         return toResponse(repository.save(guide));
     }
 
+    @Transactional
     public void delete(Long id) {
         log.info("Deleting guide profile id={}", id);
         if (!repository.existsById(id))
