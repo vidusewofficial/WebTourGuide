@@ -3,6 +3,7 @@ package com.webtourguide.tourpackage.dto;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class TourPackageRequest {
@@ -13,4 +14,6 @@ public class TourPackageRequest {
     @NotNull @DecimalMin("0.0") private BigDecimal price;
     private Integer maxParticipants;
     private Boolean active;
+    private String imageUrl;
+    private List<String> galleryUrls;
 }
