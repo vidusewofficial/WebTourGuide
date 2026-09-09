@@ -1,8 +1,21 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 
-export default function DestinationCard({ destination }) {
+export default function DestinationCard({ destination, onDelete }) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN";
   const defaultImage = "/images/b-1.jpg";
+
+  function handleDelete(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete "${destination.name}"? This action cannot be undone.`)) {
+      if (onDelete) {
+        onDelete(destination.id);
+      }
+    }
+  }
 
   return (
     <motion.div 
@@ -56,15 +69,26 @@ export default function DestinationCard({ destination }) {
             {destination.description || "Explore this wonderful destination and its attractions."}
           </p>
 
-          <div className="mt-auto">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link
-                to={`/destinations/${destination.id}`}
-                className="btn-nav-custom d-block text-center"
+          <div className="mt-auto pt-2 border-top d-flex align-items-center" style={{ gap: "8px" }}>
+            <Link
+              to={`/destinations/${destination.id}`}
+              className="btn-nav-custom flex-grow-1 text-center"
+              style={{ fontSize: "14px", padding: "8px 12px" }}
+            >
+              View Details
+            </Link>
+
+            {isAdmin && onDelete && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="btn btn-outline-danger"
+                style={{ borderRadius: "20px", padding: "6px 14px", fontSize: "13px", fontWeight: "600" }}
+                title="Delete this destination"
               >
-                View Details
-              </Link>
-            </motion.div>
+                Delete
+              </button>
+            )}
           </div>
         </div>
       </div>
