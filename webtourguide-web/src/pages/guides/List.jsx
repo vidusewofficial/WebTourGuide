@@ -102,7 +102,7 @@ export default function GuideList() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Language, e.g. Tamil, Sinhala"
+                        placeholder="Search language (e.g. Tamil)"
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
                       />
