@@ -131,7 +131,7 @@ export default function GuideEditForm() {
             </div>
 
             <div className="form-group mb-3">
-              <label className="font-weight-bold text-dark mb-1">Years of Experience</label>
+              <label className="font-weight-bold text-dark mb-1">Years of Experience <span style={{fontWeight:"normal",fontSize:"12px",color:"#888"}}>(0 - 60)</span></label>
               <input
                 type="number"
                 disabled={saving} name="yearsExperience"
