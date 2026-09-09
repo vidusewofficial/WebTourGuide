@@ -32,6 +32,7 @@ public class SecurityConfig {
             throws Exception {
 
         http
+                // CORS is configured via CorsConfig bean (or Spring MVC defaults); withDefaults() reads that bean
                 .cors(Customizer.withDefaults())
 
                 .csrf(csrf -> csrf.disable())
