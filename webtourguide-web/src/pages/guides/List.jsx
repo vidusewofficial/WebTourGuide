@@ -118,7 +118,7 @@ export default function GuideList() {
                         checked={availableOnly}
                         onChange={(e) => setAvailableOnly(e.target.checked)}
                       />
-                      <label className="custom-control-label text-white font-weight-bold" htmlFor="availableOnly">
+                      <label className="custom-control-label text-white font-weight-bold" htmlFor="availableOnly" style={{cursor: "pointer"}}>
                         Available now only
                       </label>
                     </div>
