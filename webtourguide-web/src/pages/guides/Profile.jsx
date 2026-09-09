@@ -68,7 +68,7 @@ export default function GuideProfile() {
         <div className="spinner-border text-primary" role="status">
           <span className="sr-only">Loading guide...</span>
         </div>
-        <p className="mt-3 text-muted">Loading guide profile...</p>
+        <p className="mt-3 text-muted">Loading guide profile, please wait...</p>
       </div>
     );
   }
