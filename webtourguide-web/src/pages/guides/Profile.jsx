@@ -129,7 +129,7 @@ export default function GuideProfile() {
                     alignItems: "center",
                     justifyContent: "center",
                     margin: "0 auto 16px",
-                    fontSize: "2.8rem",
+                    fontSize: "2.8rem", userSelect: "none",
                   }}
                 >
                   🧭
