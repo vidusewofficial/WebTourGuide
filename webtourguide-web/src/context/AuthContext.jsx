@@ -51,6 +51,7 @@ export function AuthProvider({ children }) {
   );
 }
 
+/** Hook to safely consume the authentication context. */
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
