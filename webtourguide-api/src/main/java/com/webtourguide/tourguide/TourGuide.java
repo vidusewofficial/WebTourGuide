@@ -13,6 +13,8 @@ import lombok.*;
 @Entity
 @Table(name = "tour_guides")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@ToString(exclude = "user")
+@EqualsAndHashCode(exclude = "user")
 public class TourGuide {
 
     /** Auto-generated primary key. */
