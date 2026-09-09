@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "tour_packages")
@@ -37,6 +38,14 @@ public class TourPackage {
     private Integer maxParticipants;
 
     private Boolean active;
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @ElementCollection
+    @CollectionTable(name = "tour_package_gallery", joinColumns = @JoinColumn(name = "package_id"))
+    @Column(name = "image_url")
+    private List<String> galleryUrls;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
