@@ -103,7 +103,7 @@ export default function GuideEditForm() {
                 onChange={handleChange}
                 placeholder="e.g. English, Sinhala, Tamil"
               />
-              <small className="text-muted">Separate multiple languages with a comma.</small>
+              <small className="text-muted">Separate multiple languages with a comma.</small>{" "}<small className="text-muted float-right">{form.languages.length}/300</small>
             </div>
 
             <div className="form-group mb-3">
