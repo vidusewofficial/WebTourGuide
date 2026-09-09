@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getDestinations, searchDestinations, filterDestinations } from "../../api/destinationApi";
+import { getDestinations, searchDestinations, filterDestinations, deleteDestination } from "../../api/destinationApi";
 import DestinationCard from "../../components/DestinationCard";
+import { useAuth } from "../../context/AuthContext";
 
 export default function DestinationList() {
+  const { user } = useAuth();
+  const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
   const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -71,6 +75,16 @@ export default function DestinationList() {
     setKeyword("");
     setCategory("ALL");
     loadAllDestinations();
+  }
+
+  async function handleDeleteDestination(id) {
+    try {
+      await deleteDestination(id);
+      setDestinations((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Failed to delete destination. Please try again.");
+    }
   }
 
   return (
@@ -160,9 +174,16 @@ export default function DestinationList() {
       {/* Destinations Grid */}
       <section className="layout_padding" style={{ backgroundColor: "#fbfbfb" }}>
         <div className="container">
-          <div className="heading_container text-center mb-5">
-            <h2>All Destinations</h2>
-            <p>Explore our complete collection of holiday destinations for an unforgettable tour experience.</p>
+          <div className="d-flex justify-content-between align-items-center flex-wrap mb-5">
+            <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
+              <h2 className="text-dark m-0">All Destinations</h2>
+              <p className="text-muted mt-1">Explore our complete collection of holiday destinations for an unforgettable tour experience.</p>
+            </div>
+            {isAdminOrStaff && (
+              <Link to="/admin/destinations/new" className="btn-nav-custom mt-3 mt-md-0">
+                + Add Destination
+              </Link>
+            )}
           </div>
 
           {loading ? (
@@ -199,7 +220,7 @@ export default function DestinationList() {
           ) : (
             <div className="row">
               {destinations.map((destination) => (
-                <DestinationCard key={destination.id} destination={destination} />
+                <DestinationCard key={destination.id} destination={destination} onDelete={handleDeleteDestination} />
               ))}
             </div>
           )}
