@@ -97,7 +97,7 @@ export default function GuideEditForm() {
               <label className="font-weight-bold text-dark mb-1">Languages Spoken</label>
               <input
                 type="text"
-                name="languages"
+                name="languages" maxLength={300}
                 className="tripbiz-input"
                 value={form.languages}
                 onChange={handleChange}
@@ -110,7 +110,7 @@ export default function GuideEditForm() {
               <label className="font-weight-bold text-dark mb-1">Skills &amp; Specialisations</label>
               <input
                 type="text"
-                name="skills"
+                name="skills" maxLength={300}
                 className="tripbiz-input"
                 value={form.skills}
                 onChange={handleChange}
@@ -122,7 +122,7 @@ export default function GuideEditForm() {
               <label className="font-weight-bold text-dark mb-1">Certifications</label>
               <input
                 type="text"
-                name="certifications"
+                name="certifications" maxLength={300}
                 className="tripbiz-input"
                 value={form.certifications}
                 onChange={handleChange}
