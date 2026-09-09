@@ -89,8 +89,8 @@ export default function GuideEditForm() {
         <div className="tripbiz-form-card">
           <h2>Edit Guide Profile</h2>
 
-          {error && <div className="alert alert-danger mb-4">{error}</div>}
-          {success && <div className="alert alert-success mb-4">{success}</div>}
+          {error && <div className="alert alert-danger mb-4" role="alert"><strong>Error: </strong>{error}</div>}
+          {success && <div className="alert alert-success mb-4" role="status"><strong>Success: </strong>{success}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group mb-3">
