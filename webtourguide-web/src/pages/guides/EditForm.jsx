@@ -101,7 +101,7 @@ export default function GuideEditForm() {
                 className="tripbiz-input"
                 value={form.languages}
                 onChange={handleChange}
-                placeholder="e.g. English, Sinhala, Tamil"
+                placeholder="e.g. English, Sinhala, Tamil" required
               />
               <small className="text-muted">Separate multiple languages with a comma.</small>{" "}<small className="text-muted float-right">{form.languages.length}/300</small>
             </div>
