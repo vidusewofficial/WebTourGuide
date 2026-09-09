@@ -216,7 +216,7 @@ export default function GuideList() {
                           alignItems: "center",
                           justifyContent: "center",
                           margin: "0 auto 12px",
-                          fontSize: "2rem",
+                          fontSize: "2rem", userSelect: "none",
                         }}
                       >
                         🧭
