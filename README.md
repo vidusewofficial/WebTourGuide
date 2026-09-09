@@ -21,6 +21,9 @@ tour packages, tour guides, and bookings in Sri Lanka.
 | **Tour Guide Mgmt**   | `com.webtourguide.tourguide`            | ✅ Done |
 | Booking System        | `com.webtourguide.booking`              | 🔧 In progress |
 
+## Milestones
+- Successfully reached 50 commits improving backend, frontend, docs, and UX!
+
 ## Quick Start
 
 ### Backend
