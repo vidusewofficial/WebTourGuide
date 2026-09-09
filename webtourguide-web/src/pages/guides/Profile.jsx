@@ -173,14 +173,14 @@ export default function GuideProfile() {
               <div className="mb-4">
                 <h5 className="font-weight-bold text-dark mb-2">Skills &amp; Specialisations</h5>
                 <p className="text-secondary" style={{ lineHeight: "1.7" }}>
-                  {guide.skills || "No skills listed."}
+                  {guide.skills || <em>No skills listed.</em>}
                 </p>
               </div>
 
               <div className="mb-4">
                 <h5 className="font-weight-bold text-dark mb-2">Certifications</h5>
                 <p className="text-secondary" style={{ lineHeight: "1.7" }}>
-                  {guide.certifications || "No certifications listed."}
+                  {guide.certifications || <em>No certifications listed.</em>}
                 </p>
               </div>
             </div>
