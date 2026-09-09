@@ -135,8 +135,8 @@ export default function GuideProfile() {
                   🧭
                 </div>
                 <h2 className="text-white font-weight-bold mb-1">{guide.fullName}</h2>
-                <p className="text-white-50 mb-2" style={{ fontSize: "14px" }}>
-                  {guide.email}
+                <p className="text-white-50 mb-2" style={{ fontSize: "14px" }}><a href={`mailto:${guide.email}</a>`} style={{color:"inherit"}}>
+                  {guide.email}</a>
                 </p>
                 <span
                   className={`badge ${guide.isAvailable ? "badge-success" : "badge-secondary"}`}
