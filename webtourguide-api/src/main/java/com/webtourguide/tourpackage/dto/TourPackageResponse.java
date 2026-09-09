@@ -3,6 +3,7 @@ package com.webtourguide.tourpackage.dto;
 import com.webtourguide.destination.dto.DestinationResponse;
 import lombok.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,4 +16,6 @@ public class TourPackageResponse {
     private BigDecimal price;
     private Integer maxParticipants;
     private Boolean active;
+    private String imageUrl;
+    private List<String> galleryUrls;
 }
