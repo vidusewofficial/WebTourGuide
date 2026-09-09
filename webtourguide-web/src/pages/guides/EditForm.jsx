@@ -152,7 +152,7 @@ export default function GuideEditForm() {
                   checked={isAvailable}
                   onChange={(e) => setIsAvailable(e.target.checked)}
                 />
-                <label className="custom-control-label font-weight-bold text-dark" htmlFor="isAvailable">
+                <label className="custom-control-label font-weight-bold text-dark" htmlFor="isAvailable" style={{cursor: "pointer"}}>
                   Currently available for bookings
                 </label>
               </div>
