@@ -16,6 +16,9 @@ import PackageList from "./pages/packages/List";
 import PackageDetail from "./pages/packages/Detail";
 import PackageCompare from "./pages/packages/Compare";
 import PackageAdminForm from "./pages/packages/AdminForm";
+import GuideList from "./pages/guides/List";
+import GuideProfile from "./pages/guides/Profile";
+import GuideEditForm from "./pages/guides/EditForm";
 
 export default function App() {
   return (
@@ -39,6 +42,13 @@ export default function App() {
             <Route element={<ProtectedRoute allow={["ADMIN", "STAFF"]} />}>
               <Route path="/admin/destinations/new" element={<DestinationAdminForm />} />
               <Route path="/admin/packages/new" element={<PackageAdminForm />} />
+            </Route>
+
+            {/* Tour Guide Management routes */}
+            <Route path="/guides" element={<GuideList />} />
+            <Route path="/guides/:id" element={<GuideProfile />} />
+            <Route element={<ProtectedRoute allow={["TOUR_GUIDE", "ADMIN"]} />}>
+              <Route path="/guides/:id/edit" element={<GuideEditForm />} />
             </Route>
           </Routes>
         </main>

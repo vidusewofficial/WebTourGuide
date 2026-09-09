@@ -60,6 +60,11 @@ export default function Navbar() {
                     Packages
                   </Link>
                 </li>
+                <li className={`nav-item ${location.pathname.startsWith("/guides") ? "active" : ""}`}>
+                  <Link className="nav-link" to="/guides" onClick={() => setIsNavOpen(false)}>
+                    Guides
+                  </Link>
+                </li>
                 <li className={`nav-item ${location.pathname === "/services" ? "active" : ""}`}>
                   <Link className="nav-link" to="/services" onClick={() => setIsNavOpen(false)}>
                     Services
