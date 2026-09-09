@@ -67,6 +67,8 @@ public class TourPackageService {
                 .price(req.getPrice())
                 .maxParticipants(req.getMaxParticipants())
                 .active(req.getActive() == null ? Boolean.TRUE : req.getActive())
+                .imageUrl(req.getImageUrl())
+                .galleryUrls(req.getGalleryUrls())
                 .build();
 
         return toResponse(repository.save(pkg));
@@ -89,6 +91,12 @@ public class TourPackageService {
         pkg.setMaxParticipants(req.getMaxParticipants());
         if (req.getActive() != null) {
             pkg.setActive(req.getActive());
+        }
+        if (req.getImageUrl() != null) {
+            pkg.setImageUrl(req.getImageUrl());
+        }
+        if (req.getGalleryUrls() != null) {
+            pkg.setGalleryUrls(req.getGalleryUrls());
         }
 
         return toResponse(repository.save(pkg));
@@ -128,6 +136,8 @@ public class TourPackageService {
                 .price(pkg.getPrice())
                 .maxParticipants(pkg.getMaxParticipants())
                 .active(pkg.getActive())
+                .imageUrl(pkg.getImageUrl())
+                .galleryUrls(pkg.getGalleryUrls())
                 .build();
     }
 }
