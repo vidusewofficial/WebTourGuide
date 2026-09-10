@@ -1,21 +1,43 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { getMyBookings, cancelBooking, rescheduleBooking } from "../../api/bookingApi";
 
-const STATUS_COLORS = {
-  PENDING: "#f39c12",
-  CONFIRMED: "#27ae60",
-  CANCELLED: "#e74c3c",
-  COMPLETED: "#2980b9",
-  RESCHEDULED: "#8e44ad",
+const STATUS_META = {
+  PENDING:     { label: "Pending",     bg: "#fff3e8", color: "#d86816", border: "#f5cba7" },
+  CONFIRMED:   { label: "Confirmed",   bg: "#e6f7ed", color: "#0d8a4f", border: "#a9dfbf" },
+  CANCELLED:   { label: "Cancelled",   bg: "#fdecea", color: "#c0392b", border: "#f1948a" },
+  COMPLETED:   { label: "Completed",   bg: "#e8f0fe", color: "#144a9e", border: "#aec6f5" },
+  RESCHEDULED: { label: "Rescheduled", bg: "#f3e8ff", color: "#6c3483", border: "#c39bd3" },
 };
+
+function StatusBadge({ status }) {
+  const meta = STATUS_META[status] || { label: status, bg: "#f0f0f0", color: "#555", border: "#ccc" };
+  return (
+    <span style={{
+      display: "inline-block",
+      padding: "4px 14px",
+      borderRadius: 20,
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: "0.4px",
+      textTransform: "uppercase",
+      background: meta.bg,
+      color: meta.color,
+      border: `1px solid ${meta.border}`,
+    }}>
+      {meta.label}
+    </span>
+  );
+}
 
 export default function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [reschedulingId, setReschedulingId] = useState(null);
   const [newDate, setNewDate] = useState("");
-  const [actionError, setActionError] = useState("");
 
   async function refresh() {
     setLoading(true);
@@ -24,7 +46,7 @@ export default function MyBookings() {
       const data = await getMyBookings();
       setBookings(data);
     } catch {
-      setError("Could not load bookings. Please refresh the page.");
+      setError("Could not load bookings. Please check that the backend is running.");
     } finally {
       setLoading(false);
     }
@@ -55,92 +77,193 @@ export default function MyBookings() {
     }
   }
 
-  const canAct = (status) => status === "PENDING" || status === "RESCHEDULED" || status === "CONFIRMED";
-
-  if (loading) return <div style={{ textAlign: "center", padding: 60, fontSize: 18, color: "#888" }}>Loading your bookings...</div>;
-  if (error) return <div style={{ textAlign: "center", padding: 60, color: "#c0392b", fontSize: 16 }}>{error}</div>;
+  const canAct = (status) =>
+    status === "PENDING" || status === "CONFIRMED" || status === "RESCHEDULED";
 
   return (
-    <div style={{ maxWidth: 900, margin: "40px auto", padding: "0 16px" }}>
-      <h2 style={{ marginBottom: 24 }}>My Bookings</h2>
-
-      {actionError && (
-        <div style={{ background: "#fff0f0", border: "1px solid #ffb3b3", color: "#c0392b", padding: "10px 14px", borderRadius: 6, marginBottom: 18 }}>
-          {actionError}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4 }}
+    >
+      {/* Hero Banner */}
+      <div className="destinations-hero">
+        <div className="destinations-hero-overlay">
+          <div className="container text-center">
+            <h1 className="destinations-hero-title">My Bookings</h1>
+            <p className="destinations-hero-subtitle">
+              View, reschedule, or cancel your tour bookings.
+            </p>
+          </div>
         </div>
-      )}
+      </div>
 
-      {bookings.length === 0 ? (
-        <div style={{ textAlign: "center", padding: 60, color: "#888", fontSize: 16 }}>
-          <p>You have no bookings yet.</p>
-          <a href="/bookings/new" style={{ color: "#1a73e8", fontWeight: 600 }}>Book your first tour →</a>
-        </div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-          {bookings.map((b) => (
-            <div key={b.id} style={{ border: "1px solid #e0e0e0", borderRadius: 10, padding: "20px 24px", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: 18 }}>{b.packageTitle || "Tour Package"}</h3>
-                  {b.guideName && <p style={{ margin: "4px 0 0", color: "#555", fontSize: 14 }}>Guide: {b.guideName}</p>}
-                </div>
-                <span style={{ background: STATUS_COLORS[b.status] || "#888", color: "#fff", padding: "4px 12px", borderRadius: 20, fontSize: 13, fontWeight: 600, whiteSpace: "nowrap" }}>
-                  {b.status}
-                </span>
-              </div>
+      {/* Bookings List */}
+      <section className="layout_padding" style={{ backgroundColor: "#f8fafc" }}>
+        <div className="container">
 
-              <div style={{ display: "flex", gap: 32, marginTop: 14, flexWrap: "wrap", fontSize: 14, color: "#444" }}>
-                <span>📅 {b.bookingDate}</span>
-                <span>👥 {b.participants} participant{b.participants !== 1 ? "s" : ""}</span>
-                <span style={{ fontWeight: 600 }}>LKR {b.totalPrice?.toFixed(2) ?? "—"}</span>
-              </div>
-
-              {canAct(b.status) && (
-                <div style={{ marginTop: 16, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-                  {reschedulingId === b.id ? (
-                    <>
-                      <input
-                        type="date"
-                        value={newDate}
-                        min={new Date().toISOString().split("T")[0]}
-                        onChange={(e) => setNewDate(e.target.value)}
-                        style={{ padding: "8px 10px", borderRadius: 6, border: "1px solid #ccc", fontSize: 14 }}
-                      />
-                      <button
-                        onClick={() => handleRescheduleSubmit(b.id)}
-                        style={{ padding: "8px 16px", background: "#8e44ad", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 600 }}
-                      >
-                        Confirm Date
-                      </button>
-                      <button
-                        onClick={() => { setReschedulingId(null); setNewDate(""); }}
-                        style={{ padding: "8px 14px", background: "#eee", color: "#333", border: "none", borderRadius: 6, cursor: "pointer" }}
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => { setReschedulingId(b.id); setNewDate(""); }}
-                        style={{ padding: "8px 16px", background: "#8e44ad", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 600 }}
-                      >
-                        Reschedule
-                      </button>
-                      <button
-                        onClick={() => handleCancel(b.id)}
-                        style={{ padding: "8px 16px", background: "#e74c3c", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 600 }}
-                      >
-                        Cancel Booking
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+          {/* Section header */}
+          <div className="d-flex justify-content-between align-items-center flex-wrap mb-5">
+            <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
+              <h2 className="text-dark m-0">Your Bookings</h2>
+              <p className="text-muted mt-1">All bookings you have made are listed below.</p>
             </div>
-          ))}
+            <Link to="/bookings/new" className="btn-nav-custom mt-3 mt-md-0">
+              + Book a New Tour
+            </Link>
+          </div>
+
+          {/* Action error */}
+          {actionError && (
+            <div className="alert alert-danger mb-4" role="alert">
+              {actionError}
+            </div>
+          )}
+
+          {/* Loading */}
+          {loading ? (
+            <div className="text-center my-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+              <p className="mt-3 text-muted">Loading your bookings...</p>
+            </div>
+
+          ) : error ? (
+            <div className="alert alert-danger text-center mx-auto" style={{ maxWidth: 600 }}>
+              <p>{error}</p>
+              <button onClick={refresh} className="btn-nav-custom mt-2">Retry</button>
+            </div>
+
+          ) : bookings.length === 0 ? (
+            <div className="text-center my-5 py-5 bg-white rounded shadow-sm">
+              <img src="/images/earth.png" alt="No bookings" style={{ width: 64, opacity: 0.4, marginBottom: 16 }} />
+              <h4 className="text-dark">No bookings yet</h4>
+              <p className="text-muted mb-4">You haven't made any bookings. Start by choosing a package!</p>
+              <Link to="/bookings/new" className="btn-nav-custom">Book Your First Tour →</Link>
+            </div>
+
+          ) : (
+            <div className="row">
+              {bookings.map((b) => (
+                <motion.div
+                  className="col-md-6 col-lg-4 mb-4"
+                  key={b.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div
+                    className="destination-card"
+                    style={{ borderTop: `4px solid ${STATUS_META[b.status]?.color || "#f07b26"}` }}
+                  >
+                    {/* Card body */}
+                    <div className="destination-card-body">
+
+                      {/* Status + Booking ID */}
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <StatusBadge status={b.status} />
+                        <span className="text-muted" style={{ fontSize: 12 }}>#{b.id}</span>
+                      </div>
+
+                      {/* Package title */}
+                      <h5 className="font-weight-bold mb-1" style={{ color: "#01122a" }}>
+                        {b.packageTitle || "Tour Package"}
+                      </h5>
+
+                      {/* Guide */}
+                      {b.guideName && (
+                        <p className="destination-card-location mb-2">
+                          <img src="/images/earth.png" alt="" style={{ width: 14, height: 14 }} />
+                          Guide: {b.guideName}
+                        </p>
+                      )}
+
+                      {/* Details grid */}
+                      <div className="row text-center mt-3 mb-3 pt-3" style={{ borderTop: "1px solid #f0f0f0" }}>
+                        <div className="col-4">
+                          <div style={{ fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: "0.5px" }}>Date</div>
+                          <div style={{ fontWeight: 700, color: "#01122a", fontSize: 13 }}>{b.bookingDate}</div>
+                        </div>
+                        <div className="col-4">
+                          <div style={{ fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: "0.5px" }}>People</div>
+                          <div style={{ fontWeight: 700, color: "#01122a", fontSize: 13 }}>👥 {b.participants}</div>
+                        </div>
+                        <div className="col-4">
+                          <div style={{ fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: "0.5px" }}>Total</div>
+                          <div style={{ fontWeight: 700, color: "#0d8a4f", fontSize: 13 }}>
+                            LKR {b.totalPrice != null ? Number(b.totalPrice).toLocaleString() : "—"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action buttons */}
+                      {canAct(b.status) && (
+                        <div className="mt-auto pt-2" style={{ borderTop: "1px solid #f0f0f0" }}>
+                          {reschedulingId === b.id ? (
+                            <div>
+                              <input
+                                type="date"
+                                value={newDate}
+                                min={new Date().toISOString().split("T")[0]}
+                                onChange={(e) => setNewDate(e.target.value)}
+                                className="tripbiz-input mb-2"
+                              />
+                              <div className="d-flex" style={{ gap: 8 }}>
+                                <button
+                                  onClick={() => handleRescheduleSubmit(b.id)}
+                                  className="btn-nav-custom flex-grow-1"
+                                  style={{ fontSize: 13, padding: "8px 12px" }}
+                                >
+                                  Save Date
+                                </button>
+                                <button
+                                  onClick={() => { setReschedulingId(null); setNewDate(""); }}
+                                  className="btn-outline-custom"
+                                  style={{ fontSize: 13, padding: "8px 12px" }}
+                                >
+                                  Back
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="d-flex" style={{ gap: 8 }}>
+                              <button
+                                onClick={() => { setReschedulingId(b.id); setNewDate(""); }}
+                                className="btn-outline-custom flex-grow-1"
+                                style={{ fontSize: 13, padding: "8px 10px" }}
+                              >
+                                Reschedule
+                              </button>
+                              <button
+                                onClick={() => handleCancel(b.id)}
+                                style={{
+                                  flex: 1,
+                                  fontSize: 13, padding: "8px 10px",
+                                  borderRadius: 25, fontWeight: 600,
+                                  border: "1px solid #c0392b",
+                                  color: "#c0392b", background: "transparent", cursor: "pointer",
+                                  transition: "all 0.3s",
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = "#c0392b"; e.currentTarget.style.color = "#fff"; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#c0392b"; }}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </section>
+    </motion.div>
   );
 }
