@@ -20,6 +20,7 @@ import GuideList from "./pages/guides/List";
 import GuideProfile from "./pages/guides/Profile";
 import GuideEditForm from "./pages/guides/EditForm";
 import NewBooking from "./pages/bookings/NewBooking";
+import MyBookings from "./pages/bookings/MyBookings";
 
 export default function App() {
   return (
