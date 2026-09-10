@@ -18,4 +18,17 @@ export default function MyBookings() {
     await rescheduleBooking(id, newDate);
     refresh();
   }
+
+  return (
+    <div className="page">
+      <h1>My Bookings</h1>
+      <table>
+        <thead>
+          <tr><th>Package</th><th>Date</th><th>Participants</th><th>Status</th><th>Total</th><th></th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  );
 }
