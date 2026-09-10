@@ -11,4 +11,11 @@ export default function MyBookings() {
     await cancelBooking(id);
     refresh();
   }
+
+  async function handleReschedule(id) {
+    const newDate = prompt("New date (YYYY-MM-DD):");
+    if (!newDate) return;
+    await rescheduleBooking(id, newDate);
+    refresh();
+  }
 }
