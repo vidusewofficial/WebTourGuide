@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -7,6 +7,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   function handleLogout() {
     logout();
@@ -14,6 +16,18 @@ export default function Navbar() {
   }
 
   const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
+  const isBookingActive = location.pathname.startsWith("/bookings") || location.pathname === "/admin/bookings";
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsBookingOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header className="header_section" style={{ zIndex: 100, position: "relative" }}>
@@ -44,7 +58,7 @@ export default function Navbar() {
             id="navbarSupportedContent"
           >
             <div className="d-flex ml-auto flex-column flex-lg-row align-items-lg-center">
-              <ul className="navbar-nav mr-lg-3">
+              <ul className="navbar-nav mr-lg-3" style={{ alignItems: "center" }}>
                 <li className={`nav-item ${location.pathname === "/" ? "active" : ""}`}>
                   <Link className="nav-link" to="/" onClick={() => setIsNavOpen(false)}>
                     Home
@@ -70,25 +84,114 @@ export default function Navbar() {
                     Services
                   </Link>
                 </li>
+
+                {/* ── Bookings dropdown (only when logged in) ── */}
                 {user && (
-                  <>
-                    <li className={`nav-item ${location.pathname === "/bookings/new" ? "active" : ""}`}>
-                      <Link className="nav-link" to="/bookings/new" onClick={() => setIsNavOpen(false)}>
-                        Book Now
-                      </Link>
-                    </li>
-                    <li className={`nav-item ${location.pathname === "/bookings/my" ? "active" : ""}`}>
-                      <Link className="nav-link" to="/bookings/my" onClick={() => setIsNavOpen(false)}>
-                        My Bookings
-                      </Link>
-                    </li>
-                  </>
-                )}
-                {isAdminOrStaff && (
-                  <li className={`nav-item ${location.pathname === "/admin/bookings" ? "active" : ""}`}>
-                    <Link className="nav-link" to="/admin/bookings" onClick={() => setIsNavOpen(false)}>
-                      All Bookings
-                    </Link>
+                  <li
+                    className={`nav-item ${isBookingActive ? "active" : ""}`}
+                    style={{ position: "relative" }}
+                    ref={dropdownRef}
+                  >
+                    <button
+                      className="nav-link"
+                      onClick={() => setIsBookingOpen((v) => !v)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "8px 12px",
+                        whiteSpace: "nowrap",
+                        color: "inherit",
+                        fontWeight: isBookingActive ? 700 : "inherit",
+                      }}
+                    >
+                      Bookings
+                      <svg
+                        width="10" height="10" viewBox="0 0 10 10"
+                        style={{
+                          transform: isBookingOpen ? "rotate(180deg)" : "rotate(0)",
+                          transition: "transform 0.2s",
+                          marginLeft: 2,
+                        }}
+                      >
+                        <path d="M1 3 L5 7 L9 3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+                      </svg>
+                    </button>
+
+                    {/* Dropdown panel */}
+                    {isBookingOpen && (
+                      <div style={{
+                        position: "absolute",
+                        top: "calc(100% + 4px)",
+                        left: 0,
+                        background: "#0c1730",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        borderRadius: 8,
+                        boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
+                        minWidth: 185,
+                        zIndex: 9999,
+                        overflow: "hidden",
+                      }}>
+
+                        <Link
+                          to="/bookings/new"
+                          onClick={() => { setIsNavOpen(false); setIsBookingOpen(false); }}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 10,
+                            padding: "12px 18px",
+                            color: location.pathname === "/bookings/new" ? "#f8c146" : "#e0e6f0",
+                            textDecoration: "none", fontSize: 14,
+                            fontWeight: location.pathname === "/bookings/new" ? 700 : 400,
+                            borderBottom: "1px solid rgba(255,255,255,0.07)",
+                            transition: "background 0.15s",
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                        >
+                          <span>📅</span> Book Now
+                        </Link>
+
+                        <Link
+                          to="/bookings/my"
+                          onClick={() => { setIsNavOpen(false); setIsBookingOpen(false); }}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 10,
+                            padding: "12px 18px",
+                            color: location.pathname === "/bookings/my" ? "#f8c146" : "#e0e6f0",
+                            textDecoration: "none", fontSize: 14,
+                            fontWeight: location.pathname === "/bookings/my" ? 700 : 400,
+                            borderBottom: isAdminOrStaff ? "1px solid rgba(255,255,255,0.07)" : "none",
+                            transition: "background 0.15s",
+                          }}
+                          onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+                          onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                        >
+                          <span>📋</span> My Bookings
+                        </Link>
+
+                        {isAdminOrStaff && (
+                          <Link
+                            to="/admin/bookings"
+                            onClick={() => { setIsNavOpen(false); setIsBookingOpen(false); }}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 10,
+                              padding: "12px 18px",
+                              color: location.pathname === "/admin/bookings" ? "#f8c146" : "#e0e6f0",
+                              textDecoration: "none", fontSize: 14,
+                              fontWeight: location.pathname === "/admin/bookings" ? 700 : 400,
+                              transition: "background 0.15s",
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.07)"}
+                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                          >
+                            <span>🗂️</span> All Bookings
+                          </Link>
+                        )}
+                      </div>
+                    )}
                   </li>
                 )}
               </ul>
