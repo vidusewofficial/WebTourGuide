@@ -13,6 +13,16 @@ export default function AdminAllBookings() {
           <tr><th>Tourist</th><th>Package</th><th>Guide</th><th>Date</th><th>Status</th><th>Total</th></tr>
         </thead>
         <tbody>
+          {bookings.map((b) => (
+            <tr key={b.id}>
+              <td>{b.touristName}</td>
+              <td>{b.packageTitle}</td>
+              <td>{b.guideName || "—"}</td>
+              <td>{b.bookingDate}</td>
+              <td>{b.status}</td>
+              <td>{b.totalPrice}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
