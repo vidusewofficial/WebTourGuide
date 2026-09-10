@@ -86,6 +86,24 @@ public class BookingService {
         return booking.getStatus().name();
     }
 
+    public BookingResponse confirm(Long id) {
+        Booking booking = findEntity(id);
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot confirm a cancelled booking");
+        }
+        booking.setStatus(BookingStatus.CONFIRMED);
+        return toResponse(repository.save(booking));
+    }
+
+    public BookingResponse complete(Long id) {
+        Booking booking = findEntity(id);
+        if (booking.getStatus() == BookingStatus.CANCELLED) {
+            throw new IllegalStateException("Cannot complete a cancelled booking");
+        }
+        booking.setStatus(BookingStatus.COMPLETED);
+        return toResponse(repository.save(booking));
+    }
+
     private User currentUser(Authentication auth) {
         return userRepository.findByEmail(auth.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Logged-in user not found"));
