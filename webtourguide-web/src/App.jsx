@@ -43,7 +43,7 @@ export default function App() {
             <Route path="/register" element={<Auth />} />
 
 
-            <Route element={<ProtectedRoute allow={["TOURIST"]} />}>
+            <Route element={<ProtectedRoute allow={["TOURIST", "ADMIN", "STAFF"]} />}>
               <Route path="/bookings/new" element={<NewBooking />} />
               <Route path="/bookings/my" element={<MyBookings />} />
             </Route>
