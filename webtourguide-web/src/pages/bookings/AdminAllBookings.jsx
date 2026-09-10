@@ -8,6 +8,13 @@ export default function AdminAllBookings() {
   return (
     <div className="page">
       <h1>All Bookings (Oversight)</h1>
+      <table>
+        <thead>
+          <tr><th>Tourist</th><th>Package</th><th>Guide</th><th>Date</th><th>Status</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
     </div>
   );
 }
