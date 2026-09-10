@@ -19,6 +19,7 @@ import PackageAdminForm from "./pages/packages/AdminForm";
 import GuideList from "./pages/guides/List";
 import GuideProfile from "./pages/guides/Profile";
 import GuideEditForm from "./pages/guides/EditForm";
+import NewBooking from "./pages/bookings/NewBooking";
 
 export default function App() {
   return (
