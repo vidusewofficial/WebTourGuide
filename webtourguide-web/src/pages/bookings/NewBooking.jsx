@@ -14,5 +14,17 @@ export default function NewBooking() {
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    try {
+      const payload = {
+        packageId: Number(form.packageId),
+        guideId: form.guideId ? Number(form.guideId) : undefined,
+        bookingDate: form.bookingDate,
+        participants: Number(form.participants),
+      };
+      await createBooking(payload);
+      navigate("/bookings/my");
+    } catch (err) {
+      setError(err.response?.data?.error || "Could not create booking");
+    }
   }
 }
