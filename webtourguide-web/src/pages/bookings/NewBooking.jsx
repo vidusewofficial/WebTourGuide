@@ -1,24 +1,23 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { createBooking } from "../../api/bookingApi";
 import axiosClient from "../../api/axiosClient";
 
 export default function NewBooking() {
   const [packages, setPackages] = useState([]);
   const [guides, setGuides] = useState([]);
-  const [form, setForm] = useState({
-    packageId: "",
-    guideId: "",
-    bookingDate: "",
-    participants: 1,
-  });
+  const [form, setForm] = useState({ packageId: "", guideId: "", bookingDate: "", participants: 1 });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axiosClient.get("/packages").then((r) => setPackages(r.data)).catch(() => {});
-    axiosClient.get("/guides").then((r) => setGuides(r.data)).catch(() => {});
+    Promise.all([
+      axiosClient.get("/packages").then((r) => setPackages(r.data)).catch(() => {}),
+      axiosClient.get("/guides").then((r) => setGuides(r.data)).catch(() => {}),
+    ]).finally(() => setLoadingData(false));
   }, []);
 
   function handleChange(e) {
@@ -28,7 +27,7 @@ export default function NewBooking() {
   const selectedPackage = packages.find((p) => String(p.id) === String(form.packageId));
   const estimatedTotal =
     selectedPackage && form.participants
-      ? (selectedPackage.price * Number(form.participants)).toFixed(2)
+      ? (selectedPackage.price * Number(form.participants)).toLocaleString("en-LK", { minimumFractionDigits: 2 })
       : null;
 
   async function handleSubmit(e) {
@@ -36,13 +35,12 @@ export default function NewBooking() {
     setError("");
     setLoading(true);
     try {
-      const payload = {
+      await createBooking({
         packageId: Number(form.packageId),
         guideId: form.guideId ? Number(form.guideId) : undefined,
         bookingDate: form.bookingDate,
         participants: Number(form.participants),
-      };
-      await createBooking(payload);
+      });
       navigate("/bookings/my");
     } catch (err) {
       setError(err.response?.data?.error || "Could not create booking. Please try again.");
@@ -52,96 +50,156 @@ export default function NewBooking() {
   }
 
   return (
-    <div style={{ maxWidth: 520, margin: "60px auto", padding: "32px", border: "1px solid #e0e0e0", borderRadius: 12, boxShadow: "0 2px 16px rgba(0,0,0,0.08)" }}>
-      <h2 style={{ marginBottom: 24 }}>Book a Tour Package</h2>
-      {error && (
-        <div style={{ background: "#fff0f0", border: "1px solid #ffb3b3", color: "#c0392b", padding: "10px 14px", borderRadius: 6, marginBottom: 18 }}>
-          {error}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4 }}
+    >
+      {/* Hero Banner */}
+      <div className="destinations-hero">
+        <div className="destinations-hero-overlay">
+          <div className="container text-center">
+            <h1 className="destinations-hero-title">Book a Tour Package</h1>
+            <p className="destinations-hero-subtitle">
+              Choose your package, pick a date, and confirm your booking in seconds.
+            </p>
+          </div>
         </div>
-      )}
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Tour Package *</label>
-          <select
-            name="packageId"
-            value={form.packageId}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "10px 12px", borderRadius: 6, border: "1px solid #ccc", fontSize: 14 }}
-          >
-            <option value="">— Select a package —</option>
-            {packages.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.title} — LKR {p.price} ({p.durationDays} day{p.durationDays !== 1 ? "s" : ""})
-              </option>
-            ))}
-          </select>
-        </div>
+      </div>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Tour Guide <span style={{ fontWeight: 400, color: "#888" }}>(optional)</span></label>
-          <select
-            name="guideId"
-            value={form.guideId}
-            onChange={handleChange}
-            style={{ width: "100%", padding: "10px 12px", borderRadius: 6, border: "1px solid #ccc", fontSize: 14 }}
-          >
-            <option value="">— No guide —</option>
-            {guides
-              .filter((g) => g.isAvailable !== false)
-              .map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.user?.fullName || g.fullName || `Guide #${g.id}`}
-                  {g.languages ? ` — ${g.languages}` : ""}
-                </option>
-              ))}
-          </select>
-        </div>
+      {/* Form Section */}
+      <section className="layout_padding" style={{ backgroundColor: "#f8fafc" }}>
+        <div className="container">
+          {loadingData ? (
+            <div className="text-center my-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="sr-only">Loading...</span>
+              </div>
+              <p className="mt-3 text-muted">Loading available packages...</p>
+            </div>
+          ) : (
+            <div className="tripbiz-form-card">
+              <h2>New Booking</h2>
 
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Booking Date *</label>
-          <input
-            name="bookingDate"
-            type="date"
-            value={form.bookingDate}
-            onChange={handleChange}
-            required
-            min={new Date().toISOString().split("T")[0]}
-            style={{ width: "100%", padding: "10px 12px", borderRadius: 6, border: "1px solid #ccc", fontSize: 14, boxSizing: "border-box" }}
-          />
-        </div>
+              {error && (
+                <div className="alert alert-danger" role="alert">
+                  {error}
+                </div>
+              )}
 
-        <div style={{ marginBottom: 24 }}>
-          <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>Number of Participants *</label>
-          <input
-            name="participants"
-            type="number"
-            min="1"
-            max={selectedPackage?.maxParticipants || 99}
-            value={form.participants}
-            onChange={handleChange}
-            required
-            style={{ width: "100%", padding: "10px 12px", borderRadius: 6, border: "1px solid #ccc", fontSize: 14, boxSizing: "border-box" }}
-          />
-          {selectedPackage && (
-            <small style={{ color: "#888" }}>Max {selectedPackage.maxParticipants} participants for this package</small>
+              <form onSubmit={handleSubmit}>
+                {/* Package */}
+                <div className="form-group mb-4">
+                  <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
+                    Tour Package <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    name="packageId"
+                    value={form.packageId}
+                    onChange={handleChange}
+                    required
+                    className="tripbiz-input"
+                    style={{ appearance: "auto" }}
+                  >
+                    <option value="">— Select a package —</option>
+                    {packages.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.title}
+                        {p.durationDays ? ` — ${p.durationDays} day${p.durationDays !== 1 ? "s" : ""}` : ""}
+                        {p.price ? ` — LKR ${Number(p.price).toLocaleString()}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedPackage && (
+                    <small className="text-muted mt-1 d-block">
+                      Max {selectedPackage.maxParticipants} participants &nbsp;·&nbsp;
+                      {selectedPackage.destination?.location || selectedPackage.destination?.name || ""}
+                    </small>
+                  )}
+                </div>
+
+                {/* Guide */}
+                <div className="form-group mb-4">
+                  <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
+                    Tour Guide <span className="text-muted" style={{ fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <select
+                    name="guideId"
+                    value={form.guideId}
+                    onChange={handleChange}
+                    className="tripbiz-input"
+                    style={{ appearance: "auto" }}
+                  >
+                    <option value="">— No guide / Assign later —</option>
+                    {guides
+                      .filter((g) => g.isAvailable !== false)
+                      .map((g) => (
+                        <option key={g.id} value={g.id}>
+                          {g.user?.fullName || `Guide #${g.id}`}
+                          {g.languages ? ` — ${g.languages}` : ""}
+                          {g.rating ? ` — ★ ${g.rating}` : ""}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                {/* Date & Participants row */}
+                <div className="row">
+                  <div className="col-md-6 mb-4">
+                    <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
+                      Booking Date <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      name="bookingDate"
+                      type="date"
+                      value={form.bookingDate}
+                      onChange={handleChange}
+                      required
+                      min={new Date().toISOString().split("T")[0]}
+                      className="tripbiz-input"
+                    />
+                  </div>
+                  <div className="col-md-6 mb-4">
+                    <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
+                      Participants <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      name="participants"
+                      type="number"
+                      min="1"
+                      max={selectedPackage?.maxParticipants || 99}
+                      value={form.participants}
+                      onChange={handleChange}
+                      required
+                      className="tripbiz-input"
+                    />
+                  </div>
+                </div>
+
+                {/* Estimated total */}
+                {estimatedTotal && (
+                  <div
+                    className="mb-4 p-3 rounded"
+                    style={{ background: "#e6f7ed", border: "1px solid #b7e4c7" }}
+                  >
+                    <span style={{ fontWeight: 700, color: "#0d8a4f", fontSize: "1.05rem" }}>
+                      Estimated Total: LKR {estimatedTotal}
+                    </span>
+                    <small className="text-muted d-block mt-1">
+                      LKR {Number(selectedPackage.price).toLocaleString()} × {form.participants} participant{form.participants != 1 ? "s" : ""}
+                    </small>
+                  </div>
+                )}
+
+                <button type="submit" className="tripbiz-btn-primary" disabled={loading}>
+                  {loading ? "Confirming Booking..." : "Confirm Booking →"}
+                </button>
+              </form>
+            </div>
           )}
         </div>
-
-        {estimatedTotal && (
-          <div style={{ background: "#f0f7ff", border: "1px solid #b3d4ff", padding: "10px 14px", borderRadius: 6, marginBottom: 20, fontWeight: 600 }}>
-            Estimated Total: LKR {estimatedTotal}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          style={{ width: "100%", padding: "12px", background: loading ? "#aaa" : "#1a73e8", color: "#fff", border: "none", borderRadius: 6, fontSize: 16, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer" }}
-        >
-          {loading ? "Booking..." : "Confirm Booking"}
-        </button>
-      </form>
-    </div>
+      </section>
+    </motion.div>
   );
 }
