@@ -10,4 +10,9 @@ export default function NewBooking() {
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+  }
 }
