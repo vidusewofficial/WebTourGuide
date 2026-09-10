@@ -70,7 +70,7 @@ export default function Navbar() {
                     Services
                   </Link>
                 </li>
-                {user?.role === "TOURIST" && (
+                {user && (
                   <>
                     <li className={`nav-item ${location.pathname === "/bookings/new" ? "active" : ""}`}>
                       <Link className="nav-link" to="/bookings/new" onClick={() => setIsNavOpen(false)}>
