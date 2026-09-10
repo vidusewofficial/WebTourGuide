@@ -70,6 +70,27 @@ export default function Navbar() {
                     Services
                   </Link>
                 </li>
+                {user?.role === "TOURIST" && (
+                  <>
+                    <li className={`nav-item ${location.pathname === "/bookings/new" ? "active" : ""}`}>
+                      <Link className="nav-link" to="/bookings/new" onClick={() => setIsNavOpen(false)}>
+                        Book Now
+                      </Link>
+                    </li>
+                    <li className={`nav-item ${location.pathname === "/bookings/my" ? "active" : ""}`}>
+                      <Link className="nav-link" to="/bookings/my" onClick={() => setIsNavOpen(false)}>
+                        My Bookings
+                      </Link>
+                    </li>
+                  </>
+                )}
+                {isAdminOrStaff && (
+                  <li className={`nav-item ${location.pathname === "/admin/bookings" ? "active" : ""}`}>
+                    <Link className="nav-link" to="/admin/bookings" onClick={() => setIsNavOpen(false)}>
+                      All Bookings
+                    </Link>
+                  </li>
+                )}
               </ul>
 
               <div className="d-flex align-items-center flex-wrap" style={{ gap: "10px" }}>
