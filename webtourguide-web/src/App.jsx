@@ -42,6 +42,10 @@ export default function App() {
             <Route path="/login" element={<Auth />} />
             <Route path="/register" element={<Auth />} />
 
+
+            <Route element={<ProtectedRoute allow={["TOURIST"]} />}>
+              <Route path="/bookings/new" element={<NewBooking />} />
+            </Route>
             <Route element={<ProtectedRoute allow={["ADMIN", "STAFF"]} />}>
               <Route path="/admin/destinations/new" element={<DestinationAdminForm />} />
               <Route path="/admin/packages/new" element={<PackageAdminForm />} />
