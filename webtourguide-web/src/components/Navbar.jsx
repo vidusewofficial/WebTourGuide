@@ -104,8 +104,8 @@ export default function Navbar() {
                         gap: 4,
                         padding: "8px 12px",
                         whiteSpace: "nowrap",
-                        color: "inherit",
-                        fontWeight: isBookingActive ? 700 : "inherit",
+                        color: "#ffffff",
+                        fontWeight: isBookingActive ? 700 : "normal",
                       }}
                     >
                       Bookings
