@@ -15,13 +15,13 @@ public class BookingController {
     public BookingController(BookingService service) { this.service = service; }
 
     @PostMapping
-    @PreAuthorize("hasRole('TOURIST')")
+    @PreAuthorize("hasAnyRole('TOURIST','ADMIN','STAFF')")
     public BookingResponse create(@Valid @RequestBody BookingCreateRequest req, Authentication auth) {
         return service.create(req, auth);
     }
 
     @GetMapping("/my")
-    @PreAuthorize("hasRole('TOURIST')")
+    @PreAuthorize("hasAnyRole('TOURIST','ADMIN','STAFF')")
     public List<BookingResponse> getMy(Authentication auth) {
         return service.getMyBookings(auth);
     }
@@ -49,5 +49,17 @@ public class BookingController {
     @PreAuthorize("hasAnyRole('TOURIST','STAFF','ADMIN')")
     public Map<String, String> getStatus(@PathVariable Long id, Authentication auth) {
         return Map.of("status", service.getStatus(id, auth));
+    }
+
+    @PatchMapping("/{id}/confirm")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    public BookingResponse confirm(@PathVariable Long id) {
+        return service.confirm(id);
+    }
+
+    @PatchMapping("/{id}/complete")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    public BookingResponse complete(@PathVariable Long id) {
+        return service.complete(id);
     }
 }
