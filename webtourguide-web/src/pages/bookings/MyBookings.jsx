@@ -6,4 +6,9 @@ export default function MyBookings() {
 
   function refresh() { getMyBookings().then(setBookings); }
   useEffect(refresh, []);
+
+  async function handleCancel(id) {
+    await cancelBooking(id);
+    refresh();
+  }
 }
