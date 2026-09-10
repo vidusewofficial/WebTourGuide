@@ -21,6 +21,7 @@ import GuideProfile from "./pages/guides/Profile";
 import GuideEditForm from "./pages/guides/EditForm";
 import NewBooking from "./pages/bookings/NewBooking";
 import MyBookings from "./pages/bookings/MyBookings";
+import AdminAllBookings from "./pages/bookings/AdminAllBookings";
 
 export default function App() {
   return (
