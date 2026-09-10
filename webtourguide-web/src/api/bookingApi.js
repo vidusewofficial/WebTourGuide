@@ -6,3 +6,4 @@ export const getAllBookings = () => axiosClient.get("/bookings").then((r) => r.d
 export const cancelBooking = (id) => axiosClient.patch(`/bookings/${id}/cancel`).then((r) => r.data);
 export const rescheduleBooking = (id, newBookingDate) =>
   axiosClient.patch(`/bookings/${id}/reschedule`, { newBookingDate }).then((r) => r.data);
+export const getBookingStatus = (id) => axiosClient.get(`/bookings/${id}/status`).then((r) => r.data);
