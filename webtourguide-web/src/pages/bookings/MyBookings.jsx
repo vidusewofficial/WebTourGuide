@@ -27,6 +27,23 @@ export default function MyBookings() {
           <tr><th>Package</th><th>Date</th><th>Participants</th><th>Status</th><th>Total</th><th></th></tr>
         </thead>
         <tbody>
+          {bookings.map((b) => (
+            <tr key={b.id}>
+              <td>{b.packageTitle}</td>
+              <td>{b.bookingDate}</td>
+              <td>{b.participants}</td>
+              <td>{b.status}</td>
+              <td>{b.totalPrice}</td>
+              <td>
+                {b.status !== "CANCELLED" && (
+                  <>
+                    <button onClick={() => handleReschedule(b.id)}>Reschedule</button>
+                    <button onClick={() => handleCancel(b.id)}>Cancel</button>
+                  </>
+                )}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
