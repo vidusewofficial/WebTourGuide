@@ -53,6 +53,7 @@ export default function TripEditor() {
         dayNumber: nextDay,
         accommodation: "",
         transportation: "",
+        activities: "",
         notes: "",
       },
     ]);
@@ -78,6 +79,7 @@ export default function TripEditor() {
           dayNumber: Number(it.dayNumber),
           accommodation: it.accommodation || null,
           transportation: it.transportation || null,
+          activities: it.activities || null,
           notes: it.notes || null,
         })),
       };
@@ -359,6 +361,32 @@ export default function TripEditor() {
                         value={item.transportation || ""}
                         onChange={(e) => updateItem(origIdx, "transportation", e.target.value)}
                         placeholder="e.g. Private van, Train"
+                        style={{
+                          width: "100%",
+                          padding: "8px 12px",
+                          borderRadius: 8,
+                          border: "1.5px solid #d1d5db",
+                          fontSize: 13,
+                          boxSizing: "border-box",
+                        }}
+                      />
+                    </div>
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <label
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 600,
+                          color: "#374151",
+                          display: "block",
+                          marginBottom: 4,
+                        }}
+                      >
+                        Activities
+                      </label>
+                      <input
+                        value={item.activities || ""}
+                        onChange={(e) => updateItem(origIdx, "activities", e.target.value)}
+                        placeholder="e.g. Hiking, wildlife safari, city tour"
                         style={{
                           width: "100%",
                           padding: "8px 12px",

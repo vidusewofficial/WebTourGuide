@@ -35,6 +35,9 @@ public class TripPlanItem {
     /** Mode of transportation for this day. */
     private String transportation;
 
+    /** Planned activities for this day (e.g. "Hiking, wildlife safari"). */
+    private String activities;
+
     /** Free-form notes for this day. */
     private String notes;
 }

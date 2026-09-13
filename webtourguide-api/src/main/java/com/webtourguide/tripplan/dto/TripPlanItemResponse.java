@@ -27,6 +27,9 @@ public class TripPlanItemResponse {
     /** Transport method used to reach the destination on this day. */
     private String transportation;
 
+    /** Planned activities for this day (e.g. "Hiking, wildlife safari"). */
+    private String activities;
+
     /** Any extra notes recorded for this day. */
     private String notes;
 }

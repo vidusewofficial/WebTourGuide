@@ -71,6 +71,7 @@ Replaces the title, dates, and **entire** items list. Any existing items not in 
       "dayNumber": 1,
       "accommodation": "Sigiriya Village Hotel",
       "transportation": "Private van",
+      "activities": "Climb the rock fortress, visit museum",
       "notes": "Climb early to avoid heat"
     },
     {
@@ -78,6 +79,7 @@ Replaces the title, dates, and **entire** items list. Any existing items not in 
       "dayNumber": 2,
       "accommodation": "Kandy Guest House",
       "transportation": "Train",
+      "activities": null,
       "notes": "Rest day"
     }
   ]
@@ -94,6 +96,7 @@ Replaces the title, dates, and **entire** items list. Any existing items not in 
 | items[].dayNumber | number | ✅ | Min 1 |
 | items[].accommodation | string | ❌ | |
 | items[].transportation | string | ❌ | |
+| items[].activities | string | ❌ | e.g. "Hiking, wildlife safari" |
 | items[].notes | string | ❌ | |
 
 **Response:** `200 OK` — updated `TripPlanResponse` with the new items list.
@@ -131,6 +134,7 @@ Permanently deletes the trip plan and all its day items.
       "dayNumber": 1,
       "accommodation": "Sigiriya Village Hotel",
       "transportation": "Private van",
+      "activities": "Climb the rock fortress, visit museum",
       "notes": "Climb early to avoid heat"
     }
   ]
