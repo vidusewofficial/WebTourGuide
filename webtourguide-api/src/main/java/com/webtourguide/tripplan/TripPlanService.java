@@ -59,7 +59,10 @@ public class TripPlanService {
 
     /**
      * Returns all trip plans belonging to the currently authenticated tourist.
+     * Transactional so the session stays open while toResponse() lazily
+     * loads each plan's items (open-in-view is disabled for this project).
      */
+    @Transactional(readOnly = true)
     public List<TripPlanResponse> getMy(Authentication auth) {
         User tourist = currentUser(auth);
         return repository.findByTouristId(tourist.getId())
@@ -74,6 +77,7 @@ public class TripPlanService {
      * @throws ResourceNotFoundException  if the plan does not exist
      * @throws AccessDeniedException      if the plan belongs to a different tourist
      */
+    @Transactional(readOnly = true)
     public TripPlanResponse getById(Long id, Authentication auth) {
         TripPlan plan = findEntity(id);
         assertOwner(plan, auth);
