@@ -17,3 +17,16 @@ INSERT IGNORE INTO tour_guides (user_id, languages, skills, certifications, year
 (10, 'English, Sinhala',        'Wildlife tours, hiking',           'SLTDA Licensed Guide',            4,  TRUE,  4.5),
 (11, 'English, Tamil',          'Cultural tours, city walks',       'SLTDA Licensed Guide, First Aid', 2,  TRUE,  4.2),
 (12, 'English, Sinhala, Tamil', 'Beach tours, water sports, yoga',  'SLTDA Licensed Guide',            7,  FALSE, 4.8);
+
+-- Sample trip plans for the seeded tourist (id 20)
+-- destination_id is left NULL (rest days) since this file does not seed any
+-- destinations; if destinations exist in your database, feel free to attach
+-- one via a follow-up UPDATE.
+INSERT IGNORE INTO trip_plans (id, tourist_id, title, start_date, end_date) VALUES
+(1, 20, 'South Coast Getaway', '2026-11-10', '2026-11-13'),
+(2, 20, 'Hill Country Weekend', '2026-12-05', '2026-12-07');
+
+INSERT IGNORE INTO trip_plan_items (id, trip_plan_id, destination_id, day_number, accommodation, transportation, notes) VALUES
+(1, 1, NULL, 1, 'Kandy Guest House', 'Train', 'Rest day before heading south'),
+(2, 1, NULL, 2, 'Sigiriya Village Hotel', 'Private van', 'Climb early to avoid heat'),
+(3, 2, NULL, 1, 'Ella Flower Garden Resort', 'Public bus', 'Hiking day');
