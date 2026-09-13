@@ -4,13 +4,16 @@
 -- =============================================================================
 USE webtourguide_db;
 
--- Sample users (passwords are BCrypt of "password123")
+-- Sample users (passwords are a real BCrypt hash of "password123",
+-- generated with the same BCryptPasswordEncoder SecurityConfig uses -
+-- the previous placeholder strings here were not valid bcrypt hashes
+-- and could never actually be logged in with)
 INSERT IGNORE INTO users (id, full_name, email, password_hash, role) VALUES
-(1,  'Admin User',        'admin@webtourguide.com',  '$2a$10$exampleHashForAdminUser1234567890', 'ADMIN'),
-(10, 'Kasun Perera',      'kasun.guide@example.com', '$2a$10$exampleHashForKasunPerera12345678', 'TOUR_GUIDE'),
-(11, 'Nimal Silva',       'nimal.guide@example.com', '$2a$10$exampleHashForNimalSilva123456789', 'TOUR_GUIDE'),
-(12, 'Amara Fernando',    'amara.guide@example.com', '$2a$10$exampleHashForAmaraFernando123456', 'TOUR_GUIDE'),
-(20, 'Tourist User',      'tourist@example.com',     '$2a$10$exampleHashForTouristUser12345678', 'TOURIST');
+(1,  'Admin User',        'admin@webtourguide.com',  '$2a$10$C2bjXgjn6HGbpRgMFUNOgOu8yYYha31tiITGKNto2PdLRjHMLN4sW', 'ADMIN'),
+(10, 'Kasun Perera',      'kasun.guide@example.com', '$2a$10$C2bjXgjn6HGbpRgMFUNOgOu8yYYha31tiITGKNto2PdLRjHMLN4sW', 'TOUR_GUIDE'),
+(11, 'Nimal Silva',       'nimal.guide@example.com', '$2a$10$C2bjXgjn6HGbpRgMFUNOgOu8yYYha31tiITGKNto2PdLRjHMLN4sW', 'TOUR_GUIDE'),
+(12, 'Amara Fernando',    'amara.guide@example.com', '$2a$10$C2bjXgjn6HGbpRgMFUNOgOu8yYYha31tiITGKNto2PdLRjHMLN4sW', 'TOUR_GUIDE'),
+(20, 'Tourist User',      'tourist@example.com',     '$2a$10$C2bjXgjn6HGbpRgMFUNOgOu8yYYha31tiITGKNto2PdLRjHMLN4sW', 'TOURIST');
 
 -- Sample guide profiles
 INSERT IGNORE INTO tour_guides (user_id, languages, skills, certifications, years_experience, is_available, rating) VALUES
