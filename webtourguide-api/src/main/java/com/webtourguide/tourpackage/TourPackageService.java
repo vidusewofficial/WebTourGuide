@@ -6,6 +6,7 @@ import com.webtourguide.destination.dto.DestinationResponse;
 import com.webtourguide.exception.ResourceNotFoundException;
 import com.webtourguide.tourpackage.dto.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,12 @@ public class TourPackageService {
         this.destinationRepository = destinationRepository;
     }
 
+    /**
+     * Transactional (readOnly) so the session stays open while toResponse()
+     * lazily loads each package's galleryUrls collection - open-in-view is
+     * disabled for this project.
+     */
+    @Transactional(readOnly = true)
     public List<TourPackageResponse> getAllActive() {
         return repository.findByActiveTrue()
                 .stream()
@@ -29,10 +36,12 @@ public class TourPackageService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public TourPackageResponse getById(Long id) {
         return toResponse(findEntity(id));
     }
 
+    @Transactional(readOnly = true)
     public List<TourPackageResponse> getByDestination(Long destinationId) {
         return repository.findByDestinationId(destinationId)
                 .stream()
@@ -40,6 +49,7 @@ public class TourPackageService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<TourPackageResponse> compare(List<Long> ids) {
         return repository.findByIdIn(ids)
                 .stream()
@@ -47,6 +57,7 @@ public class TourPackageService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<TourPackageResponse> search(String keyword) {
         return repository.findByTitleContainingIgnoreCase(keyword)
                 .stream()
@@ -54,6 +65,7 @@ public class TourPackageService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public TourPackageResponse create(TourPackageRequest req) {
         Destination destination = destinationRepository.findById(req.getDestinationId())
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -74,6 +86,7 @@ public class TourPackageService {
         return toResponse(repository.save(pkg));
     }
 
+    @Transactional
     public TourPackageResponse update(Long id, TourPackageRequest req) {
         TourPackage pkg = findEntity(id);
 
@@ -137,7 +150,11 @@ public class TourPackageService {
                 .maxParticipants(pkg.getMaxParticipants())
                 .active(pkg.getActive())
                 .imageUrl(pkg.getImageUrl())
-                .galleryUrls(pkg.getGalleryUrls())
+                // Copy into a plain ArrayList to force-fetch this lazy collection now,
+                // while the transaction (and Hibernate session) is still open - assigning
+                // the raw Hibernate proxy would defer the fetch until Jackson serializes
+                // the response later, after the session has already closed.
+                .galleryUrls(pkg.getGalleryUrls() == null ? null : new java.util.ArrayList<>(pkg.getGalleryUrls()))
                 .build();
     }
 }
