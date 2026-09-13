@@ -251,7 +251,7 @@
             "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"startDate\": \"2026-11-10\",\n  \"endDate\": \"2026-11-13\",\n  \"items\": [\n    {\n      \"destinationId\": null,\n      \"dayNumber\": 1,\n      \"accommodation\": \"Kandy Guest House\",\n      \"transportation\": \"Train\",\n      \"notes\": \"Rest day\"\n    }\n  ]\n}"
+              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"startDate\": \"2026-11-10\",\n  \"endDate\": \"2026-11-13\",\n  \"items\": [\n    {\n      \"destinationId\": null,\n      \"dayNumber\": 1,\n      \"accommodation\": \"Kandy Guest House\",\n      \"transportation\": \"Train\",\n      \"activities\": \"Rest, explore town\",\n      \"notes\": \"Rest day\"\n    }\n  ]\n}"
             }
           },
           "response": []
@@ -265,7 +265,8 @@
                 "exec": [
                   "pm.test('status 200', () => pm.response.to.have.status(200));",
                   "var d = pm.response.json();",
-                  "pm.test('destinationName resolved', () => pm.expect(d.items[0].destinationName).to.not.be.null);"
+                  "pm.test('destinationName resolved', () => pm.expect(d.items[0].destinationName).to.not.be.null);",
+                  "pm.test('activities saved', () => pm.expect(d.items[0].activities).to.eql('Climb the rock fortress, visit museum'));"
                 ],
                 "type": "text/javascript"
               }
@@ -280,7 +281,7 @@
             "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"items\": [\n    {\n      \"destinationId\": {{destinationId}},\n      \"dayNumber\": 1,\n      \"accommodation\": \"Sigiriya Village Hotel\",\n      \"transportation\": \"Private van\",\n      \"notes\": \"Climb early to avoid heat\"\n    }\n  ]\n}"
+              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"items\": [\n    {\n      \"destinationId\": {{destinationId}},\n      \"dayNumber\": 1,\n      \"accommodation\": \"Sigiriya Village Hotel\",\n      \"transportation\": \"Private van\",\n      \"activities\": \"Climb the rock fortress, visit museum\",\n      \"notes\": \"Climb early to avoid heat\"\n    }\n  ]\n}"
             }
           },
           "response": []

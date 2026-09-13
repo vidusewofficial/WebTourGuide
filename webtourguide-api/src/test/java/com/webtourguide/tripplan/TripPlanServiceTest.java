@@ -147,6 +147,7 @@ class TripPlanServiceTest {
         itemReq.setDestinationId(3L);
         itemReq.setDayNumber(1);
         itemReq.setAccommodation("Sigiriya Village Hotel");
+        itemReq.setActivities("Climb the rock fortress, visit museum");
 
         TripPlanUpdateRequest req = new TripPlanUpdateRequest();
         req.setTitle("Updated Title");
@@ -157,6 +158,7 @@ class TripPlanServiceTest {
         assertThat(response.getTitle()).isEqualTo("Updated Title");
         assertThat(response.getItems()).hasSize(1);
         assertThat(response.getItems().get(0).getDestinationName()).isEqualTo("Sigiriya Rock Fortress");
+        assertThat(response.getItems().get(0).getActivities()).isEqualTo("Climb the rock fortress, visit museum");
         // The stale item (id=100) must be gone from the in-memory collection so orphanRemoval deletes it.
         assertThat(plan.getItems()).extracting(TripPlanItem::getId).containsExactly((Long) null);
     }
