@@ -57,6 +57,7 @@ class TripPlanControllerTest {
                                 .destinationId(1L)
                                 .destinationName("Sigiriya Rock Fortress")
                                 .dayNumber(1)
+                                .activities("Climb the rock fortress")
                                 .build()
                 ))
                 .build();
@@ -152,7 +153,7 @@ class TripPlanControllerTest {
         when(service.update(eq(1L), any(TripPlanUpdateRequest.class), any())).thenReturn(sampleResponse(1L));
 
         String body = "{\"title\":\"South Coast Getaway\",\"items\":["
-                + "{\"destinationId\":1,\"dayNumber\":1,\"accommodation\":\"Sigiriya Village Hotel\"}"
+                + "{\"destinationId\":1,\"dayNumber\":1,\"accommodation\":\"Sigiriya Village Hotel\",\"activities\":\"Climb the rock fortress\"}"
                 + "]}";
 
         mockMvc.perform(put("/api/trip-plans/1")
@@ -160,7 +161,8 @@ class TripPlanControllerTest {
                         .content(body))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items.length()").value(1))
-                .andExpect(jsonPath("$.items[0].destinationName").value("Sigiriya Rock Fortress"));
+                .andExpect(jsonPath("$.items[0].destinationName").value("Sigiriya Rock Fortress"))
+                .andExpect(jsonPath("$.items[0].activities").value("Climb the rock fortress"));
     }
 
     @Test

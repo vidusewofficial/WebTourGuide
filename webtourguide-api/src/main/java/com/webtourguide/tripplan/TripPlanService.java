@@ -119,6 +119,7 @@ public class TripPlanService {
                         .dayNumber(itemReq.getDayNumber())
                         .accommodation(itemReq.getAccommodation())
                         .transportation(itemReq.getTransportation())
+                        .activities(itemReq.getActivities())
                         .notes(itemReq.getNotes())
                         .build();
                 plan.getItems().add(item);
@@ -191,6 +192,7 @@ public class TripPlanService {
                 .dayNumber(item.getDayNumber())
                 .accommodation(item.getAccommodation())
                 .transportation(item.getTransportation())
+                .activities(item.getActivities())
                 .notes(item.getNotes())
                 .build();
     }
