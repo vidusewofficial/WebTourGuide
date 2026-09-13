@@ -71,6 +71,30 @@ export default function Navbar() {
                   </Link>
                 </li>
 
+                {/* Booking links — shown for logged-in tourists/admin/staff, matching the
+                    ProtectedRoute allow list on /bookings/new and /bookings/my in App.jsx */}
+                {user && user.role !== "TOUR_GUIDE" && (
+                  <>
+                    <li className={`nav-item ${location.pathname === "/bookings/new" ? "active" : ""}`}>
+                      <Link className="nav-link" to="/bookings/new" onClick={() => setIsNavOpen(false)}>
+                        Book Now
+                      </Link>
+                    </li>
+                    <li className={`nav-item ${location.pathname === "/bookings/my" ? "active" : ""}`}>
+                      <Link className="nav-link" to="/bookings/my" onClick={() => setIsNavOpen(false)}>
+                        My Bookings
+                      </Link>
+                    </li>
+                  </>
+                )}
+                {isAdminOrStaff && (
+                  <li className={`nav-item ${location.pathname === "/admin/bookings" ? "active" : ""}`}>
+                    <Link className="nav-link" to="/admin/bookings" onClick={() => setIsNavOpen(false)}>
+                      All Bookings
+                    </Link>
+                  </li>
+                )}
+
                 {/* Trip Planning link — only shown when logged in as TOURIST */}
                 {user?.role === "TOURIST" && (
                   <li className={`nav-item ${location.pathname.startsWith("/trips") ? "active" : ""}`}>
