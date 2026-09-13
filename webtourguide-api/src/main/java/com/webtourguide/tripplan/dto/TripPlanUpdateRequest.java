@@ -1,5 +1,6 @@
 package com.webtourguide.tripplan.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.time.LocalDate;
@@ -28,5 +29,6 @@ public class TripPlanUpdateRequest {
      * Items missing from this list are removed from the database.
      * Items present in this list are added or kept.
      */
+    @Valid
     private List<TripPlanItemRequest> items;
 }
