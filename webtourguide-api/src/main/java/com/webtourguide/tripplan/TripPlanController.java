@@ -65,7 +65,7 @@ public class TripPlanController {
      */
     @PutMapping("/{id}")
     public TripPlanResponse update(@PathVariable Long id,
-                                   @RequestBody TripPlanUpdateRequest req,
+                                   @Valid @RequestBody TripPlanUpdateRequest req,
                                    Authentication auth) {
         return service.update(id, req, auth);
     }
