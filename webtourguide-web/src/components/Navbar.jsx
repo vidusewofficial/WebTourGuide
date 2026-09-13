@@ -70,6 +70,16 @@ export default function Navbar() {
                     Services
                   </Link>
                 </li>
+
+                {/* Trip Planning link — only shown when logged in as TOURIST */}
+                {user?.role === "TOURIST" && (
+                  <li className={`nav-item ${location.pathname.startsWith("/trips") ? "active" : ""}`}>
+                    <Link className="nav-link" to="/trips" onClick={() => setIsNavOpen(false)}>
+                      My Trips
+                    </Link>
+                  </li>
+                )}
+
               </ul>
 
               <div className="d-flex align-items-center flex-wrap" style={{ gap: "10px" }}>
