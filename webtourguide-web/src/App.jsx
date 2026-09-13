@@ -19,6 +19,9 @@ import PackageAdminForm from "./pages/packages/AdminForm";
 import GuideList from "./pages/guides/List";
 import GuideProfile from "./pages/guides/Profile";
 import GuideEditForm from "./pages/guides/EditForm";
+import NewBooking from "./pages/bookings/NewBooking";
+import MyBookings from "./pages/bookings/MyBookings";
+import AdminAllBookings from "./pages/bookings/AdminAllBookings";
 
 export default function App() {
   return (
@@ -39,7 +42,14 @@ export default function App() {
             <Route path="/login" element={<Auth />} />
             <Route path="/register" element={<Auth />} />
 
+
+            <Route element={<ProtectedRoute allow={["TOURIST", "ADMIN", "STAFF"]} />}>
+              <Route path="/bookings/new" element={<NewBooking />} />
+              <Route path="/bookings/my" element={<MyBookings />} />
+            </Route>
+
             <Route element={<ProtectedRoute allow={["ADMIN", "STAFF"]} />}>
+              <Route path="/admin/bookings" element={<AdminAllBookings />} />
               <Route path="/admin/destinations/new" element={<DestinationAdminForm />} />
               <Route path="/admin/packages/new" element={<PackageAdminForm />} />
             </Route>
