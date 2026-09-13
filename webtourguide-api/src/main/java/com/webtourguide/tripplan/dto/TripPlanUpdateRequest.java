@@ -29,6 +29,5 @@ public class TripPlanUpdateRequest {
      * Items missing from this list are removed from the database.
      * Items present in this list are added or kept.
      */
-    @Valid
-    private List<TripPlanItemRequest> items;
+    private List<@Valid TripPlanItemRequest> items;
 }
