@@ -182,11 +182,22 @@ export default function GuideList() {
         <div className="container">
           <div className="d-flex justify-content-between align-items-center flex-wrap mb-5">
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
-              <h2 className="text-dark m-0">All Tour Guides <span className="badge badge-primary ml-2" style={{fontSize:"14px",verticalAlign:"middle"}}>{guides.length}</span></h2>
+              <h2 className="text-dark m-0">
+                {locationFilter ? `Guides near ${locationFilter}` : "All Tour Guides"}{" "}
+                <span className="badge badge-primary ml-2" style={{fontSize:"14px",verticalAlign:"middle"}}>{guides.length}</span>
+              </h2>
               <p className="text-muted mt-1">
-                Certified, experienced guides to accompany you on every journey across Sri Lanka.{language || availableOnly ? ` — ${guides.length} result${guides.length !== 1 ? "s" : ""} found` : ""}
+                {locationFilter
+                  ? `Guides operating in or near ${locationFilter}.`
+                  : "Certified, experienced guides to accompany you on every journey across Sri Lanka."}
+                {language || availableOnly ? ` — ${guides.length} result${guides.length !== 1 ? "s" : ""} found` : ""}
               </p>
             </div>
+            {locationFilter && (
+              <button onClick={handleReset} className="btn-outline-custom">
+                ✕ Clear destination filter
+              </button>
+            )}
           </div>
 
           {loading ? (
