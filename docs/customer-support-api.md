@@ -34,3 +34,16 @@ Returns every ticket raised by the authenticated tourist. TOURIST only.
 **Response:** `200 OK` — array of `SupportTicketResponse` objects.
 
 ---
+
+### 3. Get a Single Ticket
+**GET** `/api/support/tickets/{id}`
+
+Returns one ticket by ID. TOURIST can only view their own ticket; STAFF and ADMIN can view any.
+
+**Response:** `200 OK` — single `SupportTicketResponse`.
+
+**Error responses:**
+- `404 Not Found` — ticket does not exist
+- `403 Forbidden` — ticket belongs to another tourist
+
+---
