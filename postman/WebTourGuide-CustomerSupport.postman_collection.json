@@ -1,0 +1,314 @@
+{
+  "info": {
+    "_postman_id": "customer-support-management-v1",
+    "name": "WebTourGuide — Customer Support Management",
+    "description": "Regression test set for the Customer Support Management module.\n\nEndpoints:\n  POST   /api/support/tickets            — TOURIST only, submit a new ticket\n  GET    /api/support/tickets/my         — TOURIST only, list the caller's own tickets\n  GET    /api/support/tickets/{id}       — TOURIST (own only), STAFF, ADMIN\n  GET    /api/support/tickets            — STAFF, ADMIN only, optional ?status= filter\n  PATCH  /api/support/tickets/{id}/status — STAFF, ADMIN only, advance ticket status\n\nA tourist can only view their own tickets and can never change ticket status.\nRun the Auth folder first to populate the token variables, then run Staff\nPromotion (Workbench) manually in MySQL before the Staff folder requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",            "value": "http://localhost:8080",         "type": "string" },
+    { "key": "touristToken",       "value": "<paste TOURIST JWT here>",      "type": "string" },
+    { "key": "otherTouristToken",  "value": "<paste TOURIST B JWT here>",    "type": "string" },
+    { "key": "staffToken",         "value": "<paste STAFF JWT here>",        "type": "string" },
+    { "key": "ticketId",           "value": "1",                             "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Tourist",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Vidushi Tourist\",\n  \"email\": \"vidushi.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Second Tourist (for ownership checks)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Second Tourist\",\n  \"email\": \"second.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Support Staff",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Support Staff\",\n  \"email\": \"support.staff@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Tourist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('touristToken', d.token);",
+                  "pm.test('role is TOURIST', () => pm.expect(d.role).to.eql('TOURIST'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"vidushi.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Second Tourist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('otherTouristToken', d.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"second.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Staff (after SQL promotion to STAFF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('staffToken', d.token);",
+                  "pm.test('role is STAFF', () => pm.expect(d.role).to.eql('STAFF'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"support.staff@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tourist",
+      "item": [
+        {
+          "name": "Create Ticket (Complaint)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('ticketId', d.id);",
+                  "pm.test('status is OPEN', () => pm.expect(d.status).to.eql('OPEN'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"COMPLAINT\",\n  \"subject\": \"Guide arrived 40 minutes late\",\n  \"message\": \"Our booked guide for the Sigiriya trip showed up almost an hour late with no notice.\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Tickets",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{touristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets/my", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets", "my"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Ticket By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{touristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets/{{ticketId}}", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets", "{{ticketId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Second Tourist Views First Tourist's Ticket (expect 403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{otherTouristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets/{{ticketId}}", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets", "{{ticketId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Tourist Tries To Change Status (expect 403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets/{{ticketId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets", "{{ticketId}}", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"RESOLVED\" }"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Staff",
+      "item": [
+        {
+          "name": "Get All Tickets (Open only)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{staffToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/support/tickets?status=OPEN",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "support", "tickets"],
+              "query": [{ "key": "status", "value": "OPEN" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Move Ticket To In Progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.test('status is IN_PROGRESS', () => pm.expect(d.status).to.eql('IN_PROGRESS'));",
+                  "pm.test('handledBy is set', () => pm.expect(d.handledById).to.not.be.null);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets/{{ticketId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets", "{{ticketId}}", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"IN_PROGRESS\" }"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Move Ticket To Resolved",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.test('status is RESOLVED', () => pm.expect(d.status).to.eql('RESOLVED'));",
+                  "pm.test('resolvedAt is set', () => pm.expect(d.resolvedAt).to.not.be.null);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{staffToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets/{{ticketId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets", "{{ticketId}}", "status"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"status\": \"RESOLVED\" }"
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
