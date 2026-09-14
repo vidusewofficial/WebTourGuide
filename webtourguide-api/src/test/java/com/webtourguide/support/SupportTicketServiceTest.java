@@ -43,7 +43,7 @@ class SupportTicketServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new SupportTicketService(repository, userRepository);
+        service = new SupportTicketService(repository, userRepository, bookingRepository, bookingService);
 
         tourist = User.builder().id(1L).email("tourist@example.com").fullName("Tourist One").build();
         otherTourist = User.builder().id(2L).email("other@example.com").fullName("Tourist Two").build();
