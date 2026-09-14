@@ -124,6 +124,8 @@ public class SupportTicketService {
                 .raisedByName(t.getRaisedBy().getFullName())
                 .handledById(t.getHandledBy() != null ? t.getHandledBy().getId() : null)
                 .handledByName(t.getHandledBy() != null ? t.getHandledBy().getFullName() : null)
+                .bookingId(t.getBooking() != null ? t.getBooking().getId() : null)
+                .bookingSummary(t.getBooking() != null ? bookingSummary(t.getBooking()) : null)
                 .type(t.getType().name())
                 .subject(t.getSubject())
                 .message(t.getMessage())
