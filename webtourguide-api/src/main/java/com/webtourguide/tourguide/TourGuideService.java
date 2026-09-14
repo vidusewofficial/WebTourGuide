@@ -70,7 +70,7 @@ public class TourGuideService {
             throw new IllegalStateException("This user already has a guide profile");
         TourGuide guide = TourGuide.builder()
                 .user(user).languages(req.getLanguages()).skills(req.getSkills())
-                .certifications(req.getCertifications())
+                .certifications(req.getCertifications()).location(req.getLocation())
                 .yearsExperience(req.getYearsExperience() == null ? 0 : req.getYearsExperience())
                 .isAvailable(true).rating(0.0).build();
         TourGuideResponse saved = toResponse(repository.save(guide));
