@@ -98,6 +98,7 @@ export default function StaffQueue() {
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
+                  aria-pressed={statusFilter === s}
                   className={statusFilter === s ? "btn-nav-custom" : "btn-outline-custom"}
                   style={{ padding: "6px 14px", fontSize: 13, border: statusFilter === s ? "none" : undefined }}
                 >
