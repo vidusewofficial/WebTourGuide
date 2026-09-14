@@ -317,8 +317,16 @@ export default function TripEditor() {
                           border: "1.5px solid #d1d5db",
                           fontSize: 13,
                           boxSizing: "border-box",
+                          appearance: "auto",
                         }}
-                      />
+                      >
+                        <option value="">Rest day — no destination</option>
+                        {destinations.map((d) => (
+                          <option key={d.id} value={d.id}>
+                            {d.name} ({d.location})
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label
