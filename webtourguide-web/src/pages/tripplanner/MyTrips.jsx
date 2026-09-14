@@ -1,7 +1,7 @@
 /* Trip Planning Module — Group Y2-S1-MLB-B2G2-03 */
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getMyTripPlans, createTripPlan, deleteTripPlan } from "../../api/tripPlanApi";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { getMyTripPlans, createTripPlan, updateTripPlan, deleteTripPlan } from "../../api/tripPlanApi";
 import { MAX_TRIP_TITLE_LENGTH } from "../../constants/tripPlanConstants";
 import "./tripplanner.css";
 
