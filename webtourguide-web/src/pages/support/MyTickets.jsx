@@ -142,6 +142,12 @@ export default function MyTickets() {
                           </div>
                         </div>
                       </div>
+
+                      {t.resolvedAt && (
+                        <div className="text-muted" style={{ fontSize: 12, textAlign: "center" }}>
+                          Resolved on {new Date(t.resolvedAt).toLocaleDateString()}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </motion.div>
