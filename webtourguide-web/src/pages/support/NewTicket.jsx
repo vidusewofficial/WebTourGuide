@@ -44,7 +44,10 @@ export default function NewTicket() {
     setError("");
     setLoading(true);
     try {
-      await createTicket(form);
+      await createTicket({
+        ...form,
+        bookingId: needsBooking && form.bookingId ? Number(form.bookingId) : undefined,
+      });
       navigate("/support/my");
     } catch (err) {
       setError(err.response?.data?.error || "Could not submit your request. Please try again.");
