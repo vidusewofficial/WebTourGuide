@@ -10,6 +10,7 @@ export default function GuideEditForm() {
     languages: "",
     skills: "",
     certifications: "",
+    location: "",
     yearsExperience: 0,
   });
   const [isAvailable, setIsAvailable] = useState(true);
