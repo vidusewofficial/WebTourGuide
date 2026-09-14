@@ -214,4 +214,20 @@ class SupportTicketServiceTest {
 
         assertThat(response.getId()).isEqualTo(12L);
     }
+
+    @Test
+    void updateStatus_toClosed_alsoStampsResolvedAt() {
+        SupportTicket ticket = ticketRaisedBy(tourist, 13L);
+        ticket.setHandledBy(staff);
+        when(repository.findById(13L)).thenReturn(Optional.of(ticket));
+        when(repository.save(any(SupportTicket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketStatusUpdateRequest req = new TicketStatusUpdateRequest();
+        req.setStatus(TicketStatus.CLOSED);
+
+        SupportTicketResponse response = service.updateStatus(13L, req, auth);
+
+        assertThat(response.getStatus()).isEqualTo("CLOSED");
+        assertThat(response.getResolvedAt()).isNotNull();
+    }
 }
