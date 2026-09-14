@@ -71,7 +71,9 @@ export default function MyTickets() {
           <div className="d-flex justify-content-between align-items-center flex-wrap mb-5">
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
               <h2 className="text-dark m-0">Your Requests</h2>
-              <p className="text-muted mt-1">All support requests you have raised are listed below.</p>
+              <p className="text-muted mt-1">
+                {tickets.length} request{tickets.length !== 1 ? "s" : ""} raised so far.
+              </p>
             </div>
             <Link to="/support/new" className="btn-nav-custom mt-3 mt-md-0">
               + New Request
