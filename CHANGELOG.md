@@ -17,6 +17,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - `Support` and `Support Queue` nav links in Navbar
 - 3 new React Router routes including `ProtectedRoute` for the staff queue
 - Postman collection with ownership and role regression tests
+- `docs/customer-support-api.md` endpoint reference
+- Performance index on `support_tickets.status`
+- Shared `supportConstants.js` for status and type labels
 
 ### Added — Tour Guide Management Module
 - `TourGuide` JPA entity mapped to `tour_guides` table
