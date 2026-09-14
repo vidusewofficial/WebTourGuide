@@ -81,6 +81,16 @@ public class SupportTicketService {
         if (newStatus == TicketStatus.RESOLVED || newStatus == TicketStatus.CLOSED) {
             ticket.setResolvedAt(LocalDateTime.now());
         }
+
+        // Resolving a cancellation request actually cancels the linked booking,
+        // so Booking Management stays in sync with Customer Support decisions.
+        if (newStatus == TicketStatus.RESOLVED
+                && ticket.getType() == TicketType.CANCELLATION_REQUEST
+                && ticket.getBooking() != null
+                && ticket.getBooking().getStatus() != BookingStatus.CANCELLED) {
+            bookingService.cancel(ticket.getBooking().getId(), auth);
+        }
+
         return toResponse(repository.save(ticket));
     }
 
