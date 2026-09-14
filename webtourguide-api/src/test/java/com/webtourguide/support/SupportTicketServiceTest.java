@@ -250,4 +250,25 @@ class SupportTicketServiceTest {
 
         assertThat(response.getId()).isEqualTo(14L);
     }
+
+    @Test
+    void create_savesMessageAndSubjectExactlyAsProvided() {
+        when(userRepository.findByEmail(tourist.getEmail())).thenReturn(Optional.of(tourist));
+        when(repository.save(any(SupportTicket.class))).thenAnswer(inv -> {
+            SupportTicket saved = inv.getArgument(0);
+            saved.setId(20L);
+            return saved;
+        });
+
+        SupportTicketCreateRequest req = new SupportTicketCreateRequest();
+        req.setType(TicketType.RESCHEDULE_REQUEST);
+        req.setSubject("Need to reschedule Kandy trip");
+        req.setMessage("Please move our booking to next weekend.");
+
+        SupportTicketResponse response = service.create(req, auth);
+
+        assertThat(response.getType()).isEqualTo("RESCHEDULE_REQUEST");
+        assertThat(response.getSubject()).isEqualTo("Need to reschedule Kandy trip");
+        assertThat(response.getMessage()).isEqualTo("Please move our booking to next weekend.");
+    }
 }
