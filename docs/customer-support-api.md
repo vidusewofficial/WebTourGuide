@@ -3,6 +3,7 @@
 **Base URL:** `http://localhost:8080/api/support/tickets`
 **Authentication:** All endpoints require a `Bearer <token>` JWT in the `Authorization` header.
 **Roles:** TOURIST raises and views their own tickets. STAFF and ADMIN triage every ticket.
+**Ticket types:** INQUIRY, COMPLAINT, CANCELLATION_REQUEST, RESCHEDULE_REQUEST.
 
 ---
 
