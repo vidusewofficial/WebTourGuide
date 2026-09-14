@@ -121,3 +121,14 @@ automatically assigns `handledBy` to the caller. Moving to RESOLVED or CLOSED st
 | GET /tickets/{id} | ✅ (own only) | ✅ | ✅ |
 | GET /tickets | ❌ | ✅ | ✅ |
 | PATCH /tickets/{id}/status | ❌ | ✅ | ✅ |
+
+---
+
+## Manual Testing Checklist
+
+- [ ] Tourist submits a ticket and sees it as `OPEN` on `/support/my`
+- [ ] Staff sees the new ticket on `/staff/support` filtered to `OPEN`
+- [ ] Staff moves the ticket to `IN_PROGRESS` and `handledBy` is set automatically
+- [ ] Staff moves the ticket to `RESOLVED` and `resolvedAt` is populated
+- [ ] A second tourist gets `403 Forbidden` viewing the first tourist's ticket
+- [ ] A tourist gets `403 Forbidden` calling the status update endpoint
