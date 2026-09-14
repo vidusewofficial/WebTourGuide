@@ -20,6 +20,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 - `docs/customer-support-api.md` endpoint reference
 - Performance index on `support_tickets.status`
 - Shared `supportConstants.js` for status and type labels
+- 41 automated backend tests covering ownership, roles, and validation
 
 ### Added — Tour Guide Management Module
 - `TourGuide` JPA entity mapped to `tour_guides` table
