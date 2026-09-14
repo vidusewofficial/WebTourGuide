@@ -75,8 +75,14 @@ export default function PackageList() {
 
   function handleReset() {
     setKeyword("");
-    loadAllPackages();
+    if (destinationId) {
+      setSearchParams({});
+    } else {
+      loadAllPackages();
+    }
   }
+
+  const destinationName = destinationId ? packages[0]?.destination?.name : "";
 
   async function handleDeletePackage(id) {
     try {
