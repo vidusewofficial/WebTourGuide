@@ -217,4 +217,13 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "admin@example.com", roles = "ADMIN")
+    void getMy_returns403ForAdminRole() throws Exception {
+        mockMvc.perform(get("/api/support/tickets/my"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
+    }
 }
