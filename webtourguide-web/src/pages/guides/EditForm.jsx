@@ -10,6 +10,7 @@ export default function GuideEditForm() {
     languages: "",
     skills: "",
     certifications: "",
+    location: "",
     yearsExperience: 0,
   });
   const [isAvailable, setIsAvailable] = useState(true);
@@ -25,6 +26,7 @@ export default function GuideEditForm() {
           languages: g.languages || "",
           skills: g.skills || "",
           certifications: g.certifications || "",
+          location: g.location || "",
           yearsExperience: g.yearsExperience || 0,
         });
         setIsAvailable(g.isAvailable ?? true);
@@ -52,6 +54,7 @@ export default function GuideEditForm() {
         languages: form.languages.trim() || null,
         skills: form.skills.trim() || null,
         certifications: form.certifications.trim() || null,
+        location: form.location.trim() || null,
         yearsExperience: form.yearsExperience ? parseInt(form.yearsExperience, 10) : 0,
       };
 
@@ -131,6 +134,19 @@ export default function GuideEditForm() {
             </div>
 
             <div className="form-group mb-3">
+              <label className="font-weight-bold text-dark mb-1">Operating Area / Destination</label>
+              <input
+                type="text"
+                disabled={saving} name="location" maxLength={150}
+                className="tripbiz-input"
+                value={form.location}
+                onChange={handleChange}
+                placeholder="e.g. Sigiriya, Kandy"
+              />
+              <small className="text-muted">Helps tourists find you from a destination page.</small>
+            </div>
+
+            <div className="form-group mb-3">
               <label className="font-weight-bold text-dark mb-1">Years of Experience <span style={{fontWeight:"normal",fontSize:"12px",color:"#888"}}>(0 - 60)</span></label>
               <input
                 type="number"
@@ -139,7 +155,6 @@ export default function GuideEditForm() {
                 value={form.yearsExperience}
                 onChange={handleChange}
                 min="0" max="60"
-                max="60"
               />
             </div>
 

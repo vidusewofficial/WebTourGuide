@@ -69,6 +69,18 @@ export default function Navbar() {
                     Destinations
                   </Link>
                 </li>
+                {isAdminOrStaff && (
+                  <li className={`nav-item ${location.pathname === "/admin/destinations/new" ? "active" : ""}`}>
+                    <Link
+                      className="nav-link"
+                      to="/admin/destinations/new"
+                      onClick={() => setIsNavOpen(false)}
+                      style={{ color: "#f07b26", fontWeight: "600" }}
+                    >
+                      + Add Destination
+                    </Link>
+                  </li>
+                )}
                 <li className={`nav-item ${location.pathname.startsWith("/packages") ? "active" : ""}`}>
                   <Link className="nav-link" to="/packages" onClick={() => setIsNavOpen(false)}>
                     Packages
@@ -200,6 +212,24 @@ export default function Navbar() {
                   <li className={`nav-item ${location.pathname.startsWith("/trips") ? "active" : ""}`}>
                     <Link className="nav-link" to="/trips" onClick={() => setIsNavOpen(false)}>
                       My Trips
+                    </Link>
+                  </li>
+                )}
+
+                {/* Customer Support link — tourists raise/track requests */}
+                {user?.role === "TOURIST" && (
+                  <li className={`nav-item ${location.pathname.startsWith("/support") ? "active" : ""}`}>
+                    <Link className="nav-link" to="/support/my" onClick={() => setIsNavOpen(false)}>
+                      Support
+                    </Link>
+                  </li>
+                )}
+
+                {/* Support Queue link — staff/admin triage tickets */}
+                {isAdminOrStaff && (
+                  <li className={`nav-item ${location.pathname === "/staff/support" ? "active" : ""}`}>
+                    <Link className="nav-link" to="/staff/support" onClick={() => setIsNavOpen(false)}>
+                      Support Queue
                     </Link>
                   </li>
                 )}

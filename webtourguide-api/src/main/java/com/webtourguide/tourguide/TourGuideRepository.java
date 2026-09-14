@@ -26,6 +26,14 @@ public interface TourGuideRepository extends JpaRepository<TourGuide, Long> {
     List<TourGuide> findByLanguagesContainingIgnoreCase(String language);
 
     /**
+     * Case-insensitive substring search on the {@code location} column.
+     * Lets tourists find guides operating near a given destination.
+     *
+     * @param location the location keyword, e.g. "Sigiriya"
+     */
+    List<TourGuide> findByLocationContainingIgnoreCase(String location);
+
+    /**
      * Looks up a guide profile by the linked user's ID.
      * Useful when the caller has a user ID (e.g. from the JWT) rather
      * than the guide profile ID.
