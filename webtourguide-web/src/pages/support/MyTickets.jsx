@@ -72,7 +72,7 @@ export default function MyTickets() {
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
               <h2 className="text-dark m-0">Your Requests</h2>
               <p className="text-muted mt-1">
-                {tickets.length} request{tickets.length !== 1 ? "s" : ""} raised so far.
+                {tickets.length} request{tickets.length !== 1 ? "s" : ""} raised so far, newest first.
               </p>
             </div>
             <div className="d-flex mt-3 mt-md-0" style={{ gap: 8 }}>
