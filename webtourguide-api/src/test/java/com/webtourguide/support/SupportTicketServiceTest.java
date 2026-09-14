@@ -239,4 +239,15 @@ class SupportTicketServiceTest {
 
         assertThat(results).isEmpty();
     }
+
+    @Test
+    void getById_returns200ForAdminRole() {
+        SupportTicket ticket = ticketRaisedBy(otherTourist, 14L);
+        when(repository.findById(14L)).thenReturn(Optional.of(ticket));
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))).when(auth).getAuthorities();
+
+        SupportTicketResponse response = service.getById(14L, auth);
+
+        assertThat(response.getId()).isEqualTo(14L);
+    }
 }
