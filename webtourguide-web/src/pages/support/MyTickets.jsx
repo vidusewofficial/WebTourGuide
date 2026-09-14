@@ -34,7 +34,8 @@ export default function MyTickets() {
     setError("");
     try {
       const data = await getMyTickets();
-      setTickets(data);
+      const sorted = [...data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setTickets(sorted);
     } catch {
       setError("Could not load your support history. Please check that the backend is running.");
     } finally {
