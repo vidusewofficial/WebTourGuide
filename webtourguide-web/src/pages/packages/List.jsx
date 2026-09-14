@@ -31,9 +31,28 @@ export default function PackageList() {
     }
   }
 
+  async function loadByDestination(id) {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await getPackagesByDestination(id);
+      setPackages(data);
+    } catch (err) {
+      console.error("Package API error:", err);
+      setError("Failed to load tour packages for this destination.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    loadAllPackages();
-  }, []);
+    if (destinationId) {
+      loadByDestination(destinationId);
+    } else {
+      loadAllPackages();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [destinationId]);
 
   async function handleSearch(e) {
     e.preventDefault();
