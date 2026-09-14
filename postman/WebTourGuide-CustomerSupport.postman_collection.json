@@ -201,6 +201,26 @@
           "response": []
         },
         {
+          "name": "Get Ticket By Id (Not Found)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status is 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{touristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets/999999", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets", "999999"] }
+          },
+          "response": []
+        },
+        {
           "name": "Second Tourist Views First Tourist's Ticket (expect 403)",
           "event": [
             {
