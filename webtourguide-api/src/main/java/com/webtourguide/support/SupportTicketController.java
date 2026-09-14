@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+/** REST endpoints for tourists to raise tickets and staff to triage them. */
 @RestController
 @RequestMapping("/api/support/tickets")
 public class SupportTicketController {
