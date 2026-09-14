@@ -142,7 +142,7 @@ export default function NewBooking() {
                       .filter((g) => g.isAvailable !== false)
                       .map((g) => (
                         <option key={g.id} value={g.id}>
-                          {g.user?.fullName || `Guide #${g.id}`}
+                          {g.fullName || `Guide #${g.id}`}
                           {g.languages ? ` — ${g.languages}` : ""}
                           {g.rating ? ` — ★ ${g.rating}` : ""}
                         </option>
