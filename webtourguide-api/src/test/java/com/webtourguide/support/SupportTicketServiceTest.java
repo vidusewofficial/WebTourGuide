@@ -308,4 +308,12 @@ class SupportTicketServiceTest {
 
         assertThat(results.get(0).getHandledByName()).isEqualTo(staff.getFullName());
     }
+
+    @Test
+    void updateStatus_throwsResourceNotFoundException_whenTicketDoesNotExist() {
+        when(repository.findById(16L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.updateStatus(16L, new TicketStatusUpdateRequest(), auth))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
 }
