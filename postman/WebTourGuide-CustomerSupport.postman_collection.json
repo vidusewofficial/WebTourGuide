@@ -237,6 +237,15 @@
       "name": "Staff",
       "item": [
         {
+          "name": "Get All Tickets (No Filter)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{staffToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets"] }
+          },
+          "response": []
+        },
+        {
           "name": "Get All Tickets (Open only)",
           "request": {
             "method": "GET",
