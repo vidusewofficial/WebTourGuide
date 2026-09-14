@@ -40,6 +40,7 @@ Creates a new guide profile.
   "languages": "English, Sinhala",
   "skills": "Wildlife tours, hiking",
   "certifications": "SLTDA Licensed Guide",
+  "location": "Sigiriya",
   "yearsExperience": 4
 }
 ```
