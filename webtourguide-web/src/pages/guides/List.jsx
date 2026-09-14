@@ -277,6 +277,13 @@ export default function GuideList() {
                         {g.isAvailable ? "✓ Available" : "✗ Not Available"}
                       </span>
 
+                      {g.location && (
+                        <div className="mb-2">
+                          <small className="text-muted font-weight-bold">OPERATES IN</small>
+                          <p className="mb-0 text-dark">📍 {g.location}</p>
+                        </div>
+                      )}
+
                       <div className="mb-2">
                         <small className="text-muted font-weight-bold">LANGUAGES</small>
                         <p className="mb-0 text-dark">{g.languages || "—"}</p>
