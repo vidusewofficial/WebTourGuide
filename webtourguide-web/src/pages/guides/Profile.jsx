@@ -17,7 +17,10 @@ export default function GuideProfile() {
   const canEdit =
     user &&
     (user.role === "ADMIN" ||
-      (user.role === "TOUR_GUIDE" && user.fullName === guide?.fullName));
+      (user.role === "TOUR_GUIDE" &&
+        user.email &&
+        guide?.email &&
+        user.email.toLowerCase() === guide.email.toLowerCase()));
   const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
 
   async function loadGuide() {
