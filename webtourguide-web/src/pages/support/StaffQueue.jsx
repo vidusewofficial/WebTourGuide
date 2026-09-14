@@ -157,10 +157,10 @@ export default function StaffQueue() {
                         <strong>{t.raisedByName}</strong>
                       </td>
                       <td>
-                        <div style={{ color: "#01122a", fontWeight: 600, marginBottom: 4 }}>
+                        <div style={{ color: "#01122a", fontWeight: 600, marginBottom: 4 }} title={t.subject}>
                           {t.subject}
                         </div>
-                        <div style={{ fontSize: 13, color: "#777" }}>
+                        <div style={{ fontSize: 13, color: "#777" }} title={t.message}>
                           {TYPE_LABELS[t.type] || t.type}
                         </div>
                       </td>
