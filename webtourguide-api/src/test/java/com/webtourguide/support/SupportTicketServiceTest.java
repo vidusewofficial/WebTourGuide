@@ -1,5 +1,9 @@
 package com.webtourguide.support;
 
+import com.webtourguide.booking.Booking;
+import com.webtourguide.booking.BookingRepository;
+import com.webtourguide.booking.BookingService;
+import com.webtourguide.booking.BookingStatus;
 import com.webtourguide.exception.ResourceNotFoundException;
 import com.webtourguide.support.dto.*;
 import com.webtourguide.user.User;
