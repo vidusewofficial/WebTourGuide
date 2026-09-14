@@ -25,3 +25,12 @@ Raises a new inquiry, complaint, cancellation, or reschedule request. TOURIST on
 **Response:** `200 OK` — `SupportTicketResponse` with `status: "OPEN"`.
 
 ---
+
+### 2. List My Tickets
+**GET** `/api/support/tickets/my`
+
+Returns every ticket raised by the authenticated tourist. TOURIST only.
+
+**Response:** `200 OK` — array of `SupportTicketResponse` objects.
+
+---
