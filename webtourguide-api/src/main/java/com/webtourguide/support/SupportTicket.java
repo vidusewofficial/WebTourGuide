@@ -1,5 +1,6 @@
 package com.webtourguide.support;
 
+import com.webtourguide.booking.Booking;
 import com.webtourguide.user.User;
 import jakarta.persistence.*;
 import lombok.*;
