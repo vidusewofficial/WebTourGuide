@@ -271,4 +271,15 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "tourist@example.com", roles = "TOURIST")
+    void create_rejectsInvalidTypeEnumValue() throws Exception {
+        mockMvc.perform(post("/api/support/tickets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\":\"NOT_A_REAL_TYPE\",\"subject\":\"Guide arrived late\",\"message\":\"details\"}"))
+                .andExpect(status().is5xxServerError());
+
+        verifyNoInteractions(service);
+    }
 }
