@@ -203,6 +203,24 @@ export default function Navbar() {
                     </Link>
                   </li>
                 )}
+
+                {/* Customer Support link — tourists raise/track requests */}
+                {user?.role === "TOURIST" && (
+                  <li className={`nav-item ${location.pathname.startsWith("/support") ? "active" : ""}`}>
+                    <Link className="nav-link" to="/support/my" onClick={() => setIsNavOpen(false)}>
+                      Support
+                    </Link>
+                  </li>
+                )}
+
+                {/* Support Queue link — staff/admin triage tickets */}
+                {isAdminOrStaff && (
+                  <li className={`nav-item ${location.pathname === "/staff/support" ? "active" : ""}`}>
+                    <Link className="nav-link" to="/staff/support" onClick={() => setIsNavOpen(false)}>
+                      Support Queue
+                    </Link>
+                  </li>
+                )}
               </ul>
 
               <div className="d-flex align-items-center flex-wrap" style={{ gap: "10px" }}>
