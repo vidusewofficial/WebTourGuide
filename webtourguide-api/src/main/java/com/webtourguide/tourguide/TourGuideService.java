@@ -86,6 +86,7 @@ public class TourGuideService {
         if (req.getLanguages() != null) guide.setLanguages(req.getLanguages());
         if (req.getSkills() != null) guide.setSkills(req.getSkills());
         if (req.getCertifications() != null) guide.setCertifications(req.getCertifications());
+        if (req.getLocation() != null) guide.setLocation(req.getLocation());
         if (req.getYearsExperience() != null) guide.setYearsExperience(req.getYearsExperience());
         return toResponse(repository.save(guide));
     }
