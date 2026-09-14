@@ -36,9 +36,28 @@ export default function GuideList() {
     }
   }
 
+  async function loadByLocation(loc) {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await searchGuidesByLocation(loc);
+      setGuides(data);
+    } catch (err) {
+      console.error("Guide location search error:", err);
+      setError("Failed to load guides for this destination.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    loadAllGuides();
-  }, []);
+    if (locationFilter) {
+      loadByLocation(locationFilter);
+    } else {
+      loadAllGuides();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locationFilter]);
 
   async function handleSearch(e) {
     e.preventDefault();
