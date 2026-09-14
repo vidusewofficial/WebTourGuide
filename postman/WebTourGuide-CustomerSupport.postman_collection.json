@@ -199,6 +199,22 @@
           "response": []
         },
         {
+          "name": "Create Ticket (Reschedule Request)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"RESCHEDULE_REQUEST\",\n  \"subject\": \"Move Sigiriya trip to next week\",\n  \"message\": \"Could we move our booking to the following Saturday instead?\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get My Tickets",
           "request": {
             "method": "GET",
