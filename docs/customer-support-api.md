@@ -47,3 +47,18 @@ Returns one ticket by ID. TOURIST can only view their own ticket; STAFF and ADMI
 - `403 Forbidden` — ticket belongs to another tourist
 
 ---
+
+### 4. List All Tickets
+**GET** `/api/support/tickets`
+
+Returns every ticket in the system, for triage. STAFF and ADMIN only.
+
+**Query params:**
+
+| Param | Type | Required | Notes |
+|-------|------|----------|-------|
+| status | OPEN, IN_PROGRESS, RESOLVED, CLOSED | ❌ | Filters the queue by status |
+
+**Response:** `200 OK` — array of `SupportTicketResponse` objects.
+
+---
