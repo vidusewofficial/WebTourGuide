@@ -161,7 +161,7 @@ export default function StaffQueue() {
                       </td>
                       <td>
                         <div style={{ color: "#01122a", fontWeight: 600, marginBottom: 4 }} title={t.subject}>
-                          {t.subject}
+                          {t.subject || "(no subject)"}
                         </div>
                         <div style={{ fontSize: 13, color: "#777" }} title={t.message}>
                           {TYPE_LABELS[t.type] || t.type}
