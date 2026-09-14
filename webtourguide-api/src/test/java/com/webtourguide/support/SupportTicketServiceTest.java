@@ -189,4 +189,19 @@ class SupportTicketServiceTest {
 
         assertThat(results).isEmpty();
     }
+
+    @Test
+    void updateStatus_keepsExistingHandledBy_whenAlreadyAssigned() {
+        SupportTicket ticket = ticketRaisedBy(tourist, 11L);
+        ticket.setHandledBy(staff);
+        when(repository.findById(11L)).thenReturn(Optional.of(ticket));
+        when(repository.save(any(SupportTicket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketStatusUpdateRequest req = new TicketStatusUpdateRequest();
+        req.setStatus(TicketStatus.IN_PROGRESS);
+
+        SupportTicketResponse response = service.updateStatus(11L, req, auth);
+
+        assertThat(response.getHandledById()).isEqualTo(staff.getId());
+    }
 }
