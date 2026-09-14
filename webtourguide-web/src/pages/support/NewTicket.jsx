@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { createTicket } from "../../api/supportApi";
 
@@ -58,6 +58,9 @@ export default function NewTicket() {
         <div className="container">
           <div className="tripbiz-form-card">
             <h2>New Support Request</h2>
+            <p className="mb-3">
+              <Link to="/support/my" className="text-muted">&larr; Back to My Support History</Link>
+            </p>
 
             {error && (
               <div className="alert alert-danger" role="alert">
@@ -113,7 +116,7 @@ export default function NewTicket() {
                   placeholder="Tell us what happened..."
                   required
                   rows={6}
-                  className="tripbiz-input"
+                  className="tripbiz-textarea"
                 />
               </div>
 
