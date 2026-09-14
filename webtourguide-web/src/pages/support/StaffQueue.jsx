@@ -173,6 +173,14 @@ export default function StaffQueue() {
                         <div style={{ fontSize: 13, color: "#777" }}>
                           {TYPE_LABELS[t.type] || t.type}
                         </div>
+                        {t.bookingSummary && (
+                          <div style={{ fontSize: 12, color: "#144a9e", marginTop: 2 }}>
+                            🔗 Booking {t.bookingSummary}
+                            {t.type === "CANCELLATION_REQUEST" && t.status !== "RESOLVED" && t.status !== "CLOSED" && (
+                              <span style={{ color: "#9a3412" }}> — resolving will cancel it</span>
+                            )}
+                          </div>
+                        )}
                       </td>
                       <td>
                         <StatusBadge status={t.status} />

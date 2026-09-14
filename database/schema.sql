@@ -45,6 +45,7 @@ CREATE TABLE tour_guides (
     languages VARCHAR(255),
     skills VARCHAR(255),
     certifications VARCHAR(255),
+    location VARCHAR(150),
     years_experience INT DEFAULT 0,
     is_available BOOLEAN DEFAULT TRUE,
     rating DECIMAL(2,1) DEFAULT 0.0,
@@ -53,7 +54,6 @@ CREATE TABLE tour_guides (
 
 -- Speed up availability filter queries
 CREATE INDEX idx_tour_guides_is_available ON tour_guides(is_available);
-);
 
 CREATE TABLE bookings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -97,6 +97,7 @@ CREATE TABLE support_tickets (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     raised_by BIGINT NOT NULL,
     handled_by BIGINT,
+    booking_id BIGINT,
     type ENUM('INQUIRY','COMPLAINT','CANCELLATION_REQUEST','RESCHEDULE_REQUEST') NOT NULL,
     subject VARCHAR(200) NOT NULL,
     message TEXT,
@@ -104,5 +105,6 @@ CREATE TABLE support_tickets (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     resolved_at DATETIME,
     FOREIGN KEY (raised_by) REFERENCES users(id),
-    FOREIGN KEY (handled_by) REFERENCES users(id)
+    FOREIGN KEY (handled_by) REFERENCES users(id),
+    FOREIGN KEY (booking_id) REFERENCES bookings(id)
 );

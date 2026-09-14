@@ -24,6 +24,10 @@ public class TourGuideCreateRequest {
     @Size(max = 300, message = "skills must not exceed 300 characters")
     private String skills;
 
+    /** Primary operating area/destination, max 150 characters. */
+    @Size(max = 150, message = "location must not exceed 150 characters")
+    private String location;
+
     /** Comma-separated certifications, max 300 characters. */
     @Size(max = 300, message = "certifications must not exceed 300 characters")
     private String certifications;

@@ -16,10 +16,10 @@ INSERT IGNORE INTO users (id, full_name, email, password_hash, role) VALUES
 (20, 'Tourist User',      'tourist@example.com',     '$2a$10$C2bjXgjn6HGbpRgMFUNOgOu8yYYha31tiITGKNto2PdLRjHMLN4sW', 'TOURIST');
 
 -- Sample guide profiles
-INSERT IGNORE INTO tour_guides (user_id, languages, skills, certifications, years_experience, is_available, rating) VALUES
-(10, 'English, Sinhala',        'Wildlife tours, hiking',           'SLTDA Licensed Guide',            4,  TRUE,  4.5),
-(11, 'English, Tamil',          'Cultural tours, city walks',       'SLTDA Licensed Guide, First Aid', 2,  TRUE,  4.2),
-(12, 'English, Sinhala, Tamil', 'Beach tours, water sports, yoga',  'SLTDA Licensed Guide',            7,  FALSE, 4.8);
+INSERT IGNORE INTO tour_guides (user_id, languages, skills, certifications, location, years_experience, is_available, rating) VALUES
+(10, 'English, Sinhala',        'Wildlife tours, hiking',           'SLTDA Licensed Guide',            'Sigiriya', 4,  TRUE,  4.5),
+(11, 'English, Tamil',          'Cultural tours, city walks',       'SLTDA Licensed Guide, First Aid', 'Kandy',    2,  TRUE,  4.2),
+(12, 'English, Sinhala, Tamil', 'Beach tours, water sports, yoga',  'SLTDA Licensed Guide',            'Galle',    7,  FALSE, 4.8);
 
 -- Sample trip plans for the seeded tourist (id 20)
 -- destination_id is left NULL (rest days) since this file does not seed any

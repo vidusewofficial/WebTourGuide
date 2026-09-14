@@ -24,6 +24,12 @@ Case-insensitive substring filter on the `languages` field.
 **Auth:** Public
 **Response:** `200 OK` — array of `TourGuideResponse`
 
+### GET /guides/search-location?location={area}
+Case-insensitive substring filter on the `location` field. Used to find guides operating
+near a given destination (e.g. from a Destination's "Find Guides Here" link).
+**Auth:** Public
+**Response:** `200 OK` — array of `TourGuideResponse`
+
 ### POST /guides
 Creates a new guide profile.
 **Auth:** `ADMIN` or `STAFF` (Bearer token required)
@@ -34,6 +40,7 @@ Creates a new guide profile.
   "languages": "English, Sinhala",
   "skills": "Wildlife tours, hiking",
   "certifications": "SLTDA Licensed Guide",
+  "location": "Sigiriya",
   "yearsExperience": 4
 }
 ```

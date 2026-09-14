@@ -11,4 +11,7 @@ public class SupportTicketCreateRequest {
     @NotNull private TicketType type;
     @NotBlank @Size(max = 200) private String subject;
     @NotBlank private String message;
+
+    /** Optional booking this request relates to. Must belong to the requesting tourist. */
+    private Long bookingId;
 }

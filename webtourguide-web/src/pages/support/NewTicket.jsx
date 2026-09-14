@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { createTicket } from "../../api/supportApi";
+import { getMyBookings } from "../../api/bookingApi";
 
 const TYPE_OPTIONS = [
   { value: "INQUIRY", label: "General Inquiry" },
@@ -10,11 +11,29 @@ const TYPE_OPTIONS = [
   { value: "RESCHEDULE_REQUEST", label: "Reschedule Request" },
 ];
 
+const BOOKING_RELATED_TYPES = ["CANCELLATION_REQUEST", "RESCHEDULE_REQUEST"];
+
 export default function NewTicket() {
-  const [form, setForm] = useState({ type: "INQUIRY", subject: "", message: "" });
+  const [searchParams] = useSearchParams();
+  const [form, setForm] = useState({
+    type: searchParams.get("type") || "INQUIRY",
+    subject: "",
+    message: "",
+    bookingId: searchParams.get("bookingId") || "",
+  });
+  const [bookings, setBookings] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const needsBooking = BOOKING_RELATED_TYPES.includes(form.type);
+
+  useEffect(() => {
+    if (needsBooking && bookings.length === 0) {
+      getMyBookings().then(setBookings).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needsBooking]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,7 +44,10 @@ export default function NewTicket() {
     setError("");
     setLoading(true);
     try {
-      await createTicket(form);
+      await createTicket({
+        ...form,
+        bookingId: needsBooking && form.bookingId ? Number(form.bookingId) : undefined,
+      });
       navigate("/support/my");
     } catch (err) {
       setError(err.response?.data?.error || "Could not submit your request. Please try again.");
@@ -85,6 +107,32 @@ export default function NewTicket() {
                   ))}
                 </select>
               </div>
+
+              {needsBooking && (
+                <div className="form-group mb-4">
+                  <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
+                    Related Booking <span className="text-muted" style={{ fontWeight: 400 }}>(recommended)</span>
+                  </label>
+                  <select
+                    name="bookingId"
+                    value={form.bookingId}
+                    onChange={handleChange}
+                    className="tripbiz-input"
+                    style={{ appearance: "auto" }}
+                  >
+                    <option value="">— Select the booking this relates to —</option>
+                    {bookings.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        #{b.id} — {b.packageTitle || "Booking"} — {b.bookingDate} ({b.status})
+                      </option>
+                    ))}
+                  </select>
+                  <small className="text-muted mt-1 d-block">
+                    Linking your booking lets support act on it directly — resolving a cancellation
+                    request will cancel this booking.
+                  </small>
+                </div>
+              )}
 
               <div className="form-group mb-4">
                 <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
