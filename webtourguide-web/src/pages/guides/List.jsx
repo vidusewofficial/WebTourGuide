@@ -84,7 +84,11 @@ export default function GuideList() {
   function handleReset() {
     setLanguage("");
     setAvailableOnly(false);
-    loadAllGuides();
+    if (locationFilter) {
+      setSearchParams({});
+    } else {
+      loadAllGuides();
+    }
   }
 
   async function handleDelete(id) {
