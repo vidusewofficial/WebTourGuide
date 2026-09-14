@@ -258,4 +258,17 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "tourist@example.com", roles = "TOURIST")
+    void create_returns400WhenSubjectExceedsMaxLength() throws Exception {
+        String longSubject = "x".repeat(201);
+
+        mockMvc.perform(post("/api/support/tickets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\":\"COMPLAINT\",\"subject\":\"" + longSubject + "\",\"message\":\"details\"}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
 }
