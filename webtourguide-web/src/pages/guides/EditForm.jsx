@@ -89,28 +89,28 @@ export default function GuideEditForm() {
         <div className="tripbiz-form-card">
           <h2>Edit Guide Profile</h2>
 
-          {error && <div className="alert alert-danger mb-4">{error}</div>}
-          {success && <div className="alert alert-success mb-4">{success}</div>}
+          {error && <div className="alert alert-danger mb-4" role="alert"><strong>Error: </strong>{error}</div>}
+          {success && <div className="alert alert-success mb-4" role="status"><strong>Success: </strong>{success}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="form-group mb-3">
               <label className="font-weight-bold text-dark mb-1">Languages Spoken</label>
               <input
                 type="text"
-                name="languages"
+                disabled={saving} name="languages" maxLength={300}
                 className="tripbiz-input"
                 value={form.languages}
                 onChange={handleChange}
-                placeholder="e.g. English, Sinhala, Tamil"
+                placeholder="e.g. English, Sinhala, Tamil" required
               />
-              <small className="text-muted">Separate multiple languages with a comma.</small>
+              <small className="text-muted">Separate multiple languages with a comma.</small>{" "}<small className="text-muted float-right">{form.languages.length}/300</small>
             </div>
 
             <div className="form-group mb-3">
               <label className="font-weight-bold text-dark mb-1">Skills &amp; Specialisations</label>
               <input
                 type="text"
-                name="skills"
+                disabled={saving} name="skills" maxLength={300}
                 className="tripbiz-input"
                 value={form.skills}
                 onChange={handleChange}
@@ -122,7 +122,7 @@ export default function GuideEditForm() {
               <label className="font-weight-bold text-dark mb-1">Certifications</label>
               <input
                 type="text"
-                name="certifications"
+                disabled={saving} name="certifications" maxLength={300}
                 className="tripbiz-input"
                 value={form.certifications}
                 onChange={handleChange}
@@ -131,14 +131,14 @@ export default function GuideEditForm() {
             </div>
 
             <div className="form-group mb-3">
-              <label className="font-weight-bold text-dark mb-1">Years of Experience</label>
+              <label className="font-weight-bold text-dark mb-1">Years of Experience <span style={{fontWeight:"normal",fontSize:"12px",color:"#888"}}>(0 - 60)</span></label>
               <input
                 type="number"
-                name="yearsExperience"
+                disabled={saving} name="yearsExperience"
                 className="tripbiz-input"
                 value={form.yearsExperience}
                 onChange={handleChange}
-                min="0"
+                min="0" max="60"
                 max="60"
               />
             </div>
@@ -152,7 +152,7 @@ export default function GuideEditForm() {
                   checked={isAvailable}
                   onChange={(e) => setIsAvailable(e.target.checked)}
                 />
-                <label className="custom-control-label font-weight-bold text-dark" htmlFor="isAvailable">
+                <label className="custom-control-label font-weight-bold text-dark" htmlFor="isAvailable" style={{cursor: "pointer"}}>
                   Currently available for bookings
                 </label>
               </div>

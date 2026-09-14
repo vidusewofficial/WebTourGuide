@@ -102,7 +102,7 @@ export default function GuideList() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Language, e.g. Tamil, Sinhala"
+                        placeholder="Search language (e.g. Tamil)"
                         value={language}
                         onChange={(e) => setLanguage(e.target.value)}
                       />
@@ -118,7 +118,7 @@ export default function GuideList() {
                         checked={availableOnly}
                         onChange={(e) => setAvailableOnly(e.target.checked)}
                       />
-                      <label className="custom-control-label text-white font-weight-bold" htmlFor="availableOnly">
+                      <label className="custom-control-label text-white font-weight-bold" htmlFor="availableOnly" style={{cursor: "pointer"}}>
                         Available now only
                       </label>
                     </div>
@@ -151,9 +151,9 @@ export default function GuideList() {
         <div className="container">
           <div className="d-flex justify-content-between align-items-center flex-wrap mb-5">
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
-              <h2 className="text-dark m-0">All Tour Guides</h2>
+              <h2 className="text-dark m-0">All Tour Guides <span className="badge badge-primary ml-2" style={{fontSize:"14px",verticalAlign:"middle"}}>{guides.length}</span></h2>
               <p className="text-muted mt-1">
-                Certified, experienced guides to accompany you on every journey across Sri Lanka.
+                Certified, experienced guides to accompany you on every journey across Sri Lanka.{language || availableOnly ? ` — ${guides.length} result${guides.length !== 1 ? "s" : ""} found` : ""}
               </p>
             </div>
           </div>
@@ -216,7 +216,7 @@ export default function GuideList() {
                           alignItems: "center",
                           justifyContent: "center",
                           margin: "0 auto 12px",
-                          fontSize: "2rem",
+                          fontSize: "2rem", userSelect: "none",
                         }}
                       >
                         🧭

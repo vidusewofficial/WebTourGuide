@@ -43,7 +43,7 @@ public class Destination {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "destination_gallery", joinColumns = @JoinColumn(name = "destination_id"))
     @Column(name = "image_url")
     private java.util.List<String> galleryUrls;
