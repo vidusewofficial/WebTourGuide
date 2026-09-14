@@ -20,6 +20,7 @@ export default function TripEditor() {
   const navigate = useNavigate();
   const [plan, setPlan] = useState(null);
   const [items, setItems] = useState([]);
+  const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
