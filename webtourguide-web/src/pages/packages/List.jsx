@@ -195,13 +195,22 @@ export default function PackageList() {
         <div className="container">
           <div className="d-flex justify-content-between align-items-center flex-wrap mb-4">
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
-              <h2 className="text-dark m-0">Available Packages</h2>
+              <h2 className="text-dark m-0">
+                {destinationId ? `Packages for ${destinationName || "this Destination"}` : "Available Packages"}
+              </h2>
               <p className="text-muted mt-1">
-                Select up to 3 packages with the checkbox to compare them side-by-side.
+                {destinationId
+                  ? "Showing only packages that include this destination."
+                  : "Select up to 3 packages with the checkbox to compare them side-by-side."}
               </p>
             </div>
 
             <div className="d-flex align-items-center flex-wrap mt-3 mt-md-0" style={{ gap: "10px" }}>
+              {destinationId && (
+                <button onClick={handleReset} className="btn-outline-custom">
+                  ✕ Clear destination filter
+                </button>
+              )}
               {selected.length > 1 && (
                 <Link
                   to={`/packages/compare?ids=${selected.join(",")}`}
