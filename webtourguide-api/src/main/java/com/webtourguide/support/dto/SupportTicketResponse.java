@@ -3,6 +3,7 @@ package com.webtourguide.support.dto;
 import lombok.*;
 import java.time.LocalDateTime;
 
+/** Ticket detail returned to tourists, staff, and admin. */
 @Data @Builder
 public class SupportTicketResponse {
     private Long id;
