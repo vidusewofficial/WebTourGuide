@@ -304,14 +304,12 @@ export default function TripEditor() {
                           marginBottom: 4,
                         }}
                       >
-                        Destination ID{" "}
+                        Destination{" "}
                         <span style={{ fontWeight: 400, color: "#9ca3af" }}>(optional)</span>
                       </label>
-                      <input
-                        type="number"
+                      <select
                         value={item.destinationId || ""}
                         onChange={(e) => updateItem(origIdx, "destinationId", e.target.value)}
-                        placeholder="Leave blank for rest day"
                         style={{
                           width: "100%",
                           padding: "8px 12px",
