@@ -55,14 +55,18 @@ export default function MyTrips() {
     setCreating(true);
     setError("");
     try {
-      await createTripPlan({
+      const plan = await createTripPlan({
         title: form.title,
         startDate: form.startDate || null,
         endDate: form.endDate || null,
       });
       setForm({ title: "", startDate: "", endDate: "" });
       setShowForm(false);
-      refresh();
+      if (addDestinationId) {
+        await addDestinationToTrip(plan);
+      } else {
+        refresh();
+      }
     } catch (err) {
       setError(err?.response?.data?.error || "Failed to create trip plan.");
     } finally {
