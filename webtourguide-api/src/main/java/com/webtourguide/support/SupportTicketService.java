@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/** Business rules for raising, viewing, and triaging support tickets. */
 @Service
 public class SupportTicketService {
     private final SupportTicketRepository repository;
