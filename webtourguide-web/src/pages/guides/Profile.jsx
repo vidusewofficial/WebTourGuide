@@ -171,6 +171,12 @@ export default function GuideProfile() {
                   </h6>
                   <p className="text-dark font-weight-bold mb-0">⭐ {guide.rating?.toFixed(1) ?? "0.0"} / 5.0</p>
                 </div>
+                <div className="col-md-6 mb-4">
+                  <h6 className="font-weight-bold text-muted mb-1" style={{ textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                    Operating Area
+                  </h6>
+                  <p className="text-dark font-weight-bold mb-0">{guide.location || "—"}</p>
+                </div>
               </div>
 
               <hr />
