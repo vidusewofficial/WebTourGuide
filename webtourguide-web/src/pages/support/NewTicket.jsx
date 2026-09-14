@@ -92,6 +92,9 @@ export default function NewTicket() {
               <div className="form-group mb-4">
                 <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
                   Subject <span className="text-danger">*</span>
+                  <span className="text-muted" style={{ fontWeight: 400, fontSize: 12, marginLeft: 8 }}>
+                    {form.subject.length}/200
+                  </span>
                 </label>
                 <input
                   name="subject"
