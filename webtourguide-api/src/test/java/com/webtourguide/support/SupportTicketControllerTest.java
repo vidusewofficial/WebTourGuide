@@ -165,4 +165,16 @@ class SupportTicketControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("RESOLVED"));
     }
+
+    @Test
+    @WithMockUser(username = "staff@example.com", roles = "STAFF")
+    void updateStatus_returns404WhenTicketDoesNotExist() throws Exception {
+        when(service.updateStatus(eq(99L), any(TicketStatusUpdateRequest.class), any()))
+                .thenThrow(new ResourceNotFoundException("Support ticket 99 not found"));
+
+        mockMvc.perform(patch("/api/support/tickets/99/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"RESOLVED\"}"))
+                .andExpect(status().isNotFound());
+    }
 }
