@@ -1,7 +1,7 @@
 /* Trip Planning Module — Group Y2-S1-MLB-B2G2-03 */
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getMyTripPlans, createTripPlan, deleteTripPlan } from "../../api/tripPlanApi";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { getMyTripPlans, createTripPlan, updateTripPlan, deleteTripPlan } from "../../api/tripPlanApi";
 import { MAX_TRIP_TITLE_LENGTH } from "../../constants/tripPlanConstants";
 import "./tripplanner.css";
 
@@ -9,11 +9,20 @@ import "./tripplanner.css";
  * MyTrips page — shows all trip plans for the logged-in tourist.
  * Allows creating a new plan and deleting an existing one.
  * Click "Edit Itinerary" to go to TripEditor and add day-by-day items.
+ *
+ * Arriving here from a Destination page with ?addDestinationId=&addDestinationName=
+ * lets the tourist drop that destination straight into an existing or brand-new trip.
  */
 export default function MyTrips() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const addDestinationId = searchParams.get("addDestinationId");
+  const addDestinationName = searchParams.get("addDestinationName");
+
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [addingTripId, setAddingTripId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", startDate: "", endDate: "" });
   const [error, setError] = useState("");
@@ -46,18 +55,57 @@ export default function MyTrips() {
     setCreating(true);
     setError("");
     try {
-      await createTripPlan({
+      const plan = await createTripPlan({
         title: form.title,
         startDate: form.startDate || null,
         endDate: form.endDate || null,
       });
       setForm({ title: "", startDate: "", endDate: "" });
       setShowForm(false);
-      refresh();
+      if (addDestinationId) {
+        await addDestinationToTrip(plan);
+      } else {
+        refresh();
+      }
     } catch (err) {
       setError(err?.response?.data?.error || "Failed to create trip plan.");
     } finally {
       setCreating(false);
+    }
+  }
+
+  /** Appends the destination from the query string as the next day of `trip`, then opens the editor. */
+  async function addDestinationToTrip(trip) {
+    setAddingTripId(trip.id);
+    setError("");
+    try {
+      const existingItems = trip.items || [];
+      const nextDay =
+        existingItems.length > 0
+          ? Math.max(...existingItems.map((i) => Number(i.dayNumber) || 0)) + 1
+          : 1;
+      const items = [
+        ...existingItems.map((i) => ({
+          destinationId: i.destinationId || null,
+          dayNumber: i.dayNumber,
+          accommodation: i.accommodation || null,
+          transportation: i.transportation || null,
+          activities: i.activities || null,
+          notes: i.notes || null,
+        })),
+        { destinationId: Number(addDestinationId), dayNumber: nextDay },
+      ];
+      await updateTripPlan(trip.id, {
+        title: trip.title,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        items,
+      });
+      navigate(`/trips/${trip.id}`);
+    } catch (err) {
+      setError(err?.response?.data?.error || "Failed to add destination to this trip.");
+    } finally {
+      setAddingTripId(null);
     }
   }
 
@@ -106,6 +154,36 @@ export default function MyTrips() {
             {showForm ? "✕ Cancel" : "+ New Trip"}
           </button>
         </div>
+
+        {/* ── Add-destination banner ── */}
+        {addDestinationId && (
+          <div
+            style={{
+              background: "#fff7ed",
+              border: "1px solid #fed7aa",
+              color: "#9a3412",
+              padding: "14px 18px",
+              borderRadius: 8,
+              marginBottom: 20,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 8,
+            }}
+          >
+            <span>
+              📍 Adding <strong>{addDestinationName || "this destination"}</strong> to a trip — pick a
+              trip below, or create a new one.
+            </span>
+            <button
+              onClick={() => setSearchParams({})}
+              style={{ background: "transparent", border: "none", color: "#9a3412", fontWeight: 600, cursor: "pointer" }}
+            >
+              ✕ Cancel
+            </button>
+          </div>
+        )}
 
         {/* ── Error banner ── */}
         {error && (
@@ -248,22 +326,43 @@ export default function MyTrips() {
                 )}
 
                 <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                  <Link
-                    to={`/trips/${t.id}`}
-                    style={{
-                      flex: 1,
-                      textAlign: "center",
-                      background: "#0c1730",
-                      color: "#fff",
-                      padding: "8px 0",
-                      borderRadius: 8,
-                      textDecoration: "none",
-                      fontSize: 13,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Edit Itinerary
-                  </Link>
+                  {addDestinationId ? (
+                    <button
+                      onClick={() => addDestinationToTrip(t)}
+                      disabled={addingTripId === t.id}
+                      style={{
+                        flex: 1,
+                        textAlign: "center",
+                        background: addingTripId === t.id ? "#9ca3af" : "#f07b26",
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 0",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: addingTripId === t.id ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      {addingTripId === t.id ? "Adding..." : `+ Add ${addDestinationName || "Here"}`}
+                    </button>
+                  ) : (
+                    <Link
+                      to={`/trips/${t.id}`}
+                      style={{
+                        flex: 1,
+                        textAlign: "center",
+                        background: "#0c1730",
+                        color: "#fff",
+                        padding: "8px 0",
+                        borderRadius: 8,
+                        textDecoration: "none",
+                        fontSize: 13,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Edit Itinerary
+                    </Link>
+                  )}
                   <button
                     onClick={() => handleDelete(t.id)}
                     style={{

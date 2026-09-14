@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getPackages, searchPackages, deletePackage } from "../../api/packageApi";
+import { getPackages, getPackagesByDestination, searchPackages, deletePackage } from "../../api/packageApi";
 import { useAuth } from "../../context/AuthContext";
 
 export default function PackageList() {
   const { user } = useAuth();
   const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const destinationId = searchParams.get("destination") || "";
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -29,9 +31,28 @@ export default function PackageList() {
     }
   }
 
+  async function loadByDestination(id) {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await getPackagesByDestination(id);
+      setPackages(data);
+    } catch (err) {
+      console.error("Package API error:", err);
+      setError("Failed to load tour packages for this destination.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    loadAllPackages();
-  }, []);
+    if (destinationId) {
+      loadByDestination(destinationId);
+    } else {
+      loadAllPackages();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [destinationId]);
 
   async function handleSearch(e) {
     e.preventDefault();
@@ -54,8 +75,14 @@ export default function PackageList() {
 
   function handleReset() {
     setKeyword("");
-    loadAllPackages();
+    if (destinationId) {
+      setSearchParams({});
+    } else {
+      loadAllPackages();
+    }
   }
+
+  const destinationName = destinationId ? packages[0]?.destination?.name : "";
 
   async function handleDeletePackage(id) {
     try {
@@ -168,13 +195,22 @@ export default function PackageList() {
         <div className="container">
           <div className="d-flex justify-content-between align-items-center flex-wrap mb-4">
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
-              <h2 className="text-dark m-0">Available Packages</h2>
+              <h2 className="text-dark m-0">
+                {destinationId ? `Packages for ${destinationName || "this Destination"}` : "Available Packages"}
+              </h2>
               <p className="text-muted mt-1">
-                Select up to 3 packages with the checkbox to compare them side-by-side.
+                {destinationId
+                  ? "Showing only packages that include this destination."
+                  : "Select up to 3 packages with the checkbox to compare them side-by-side."}
               </p>
             </div>
 
             <div className="d-flex align-items-center flex-wrap mt-3 mt-md-0" style={{ gap: "10px" }}>
+              {destinationId && (
+                <button onClick={handleReset} className="btn-outline-custom">
+                  ✕ Clear destination filter
+                </button>
+              )}
               {selected.length > 1 && (
                 <Link
                   to={`/packages/compare?ids=${selected.join(",")}`}

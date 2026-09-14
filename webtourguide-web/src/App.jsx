@@ -28,6 +28,11 @@ import GuideList from "./pages/guides/List";
 import GuideProfile from "./pages/guides/Profile";
 import GuideEditForm from "./pages/guides/EditForm";
 
+// Customer Support Management routes — Group Y2-S1-MLB-B2G2-03
+import NewTicket from "./pages/support/NewTicket";
+import MyTickets from "./pages/support/MyTickets";
+import StaffQueue from "./pages/support/StaffQueue";
+
 export default function App() {
   return (
     <AuthProvider>
@@ -69,6 +74,15 @@ export default function App() {
             <Route element={<ProtectedRoute allow={["TOURIST"]} />}>
               <Route path="/trips" element={<MyTrips />} />
               <Route path="/trips/:id" element={<TripEditor />} />
+            </Route>
+
+            {/* Customer Support Management routes */}
+            <Route element={<ProtectedRoute allow={["TOURIST"]} />}>
+              <Route path="/support/new" element={<NewTicket />} />
+              <Route path="/support/my" element={<MyTickets />} />
+            </Route>
+            <Route element={<ProtectedRoute allow={["STAFF", "ADMIN"]} />}>
+              <Route path="/staff/support" element={<StaffQueue />} />
             </Route>
           </Routes>
         </main>

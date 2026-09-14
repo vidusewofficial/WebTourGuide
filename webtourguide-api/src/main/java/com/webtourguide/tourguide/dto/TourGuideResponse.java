@@ -29,6 +29,9 @@ public class TourGuideResponse {
     /** Comma-separated skills and specialisations. */
     private String skills;
 
+    /** Primary operating area/destination, e.g. "Sigiriya" or "Kandy, Ella". */
+    private String location;
+
     /** Comma-separated professional certifications. */
     private String certifications;
 

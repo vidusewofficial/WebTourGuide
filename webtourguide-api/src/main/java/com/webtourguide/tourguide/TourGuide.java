@@ -38,6 +38,10 @@ public class TourGuide {
     @Column(length = 300)
     private String skills;
 
+    /** Primary operating area/destination, e.g. "Sigiriya" or "Kandy, Ella". */
+    @Column(length = 150)
+    private String location;
+
     /** Comma-separated certifications, e.g. "SLTDA Licensed Guide, First Aid". */
     @Column(length = 300)
     private String certifications;

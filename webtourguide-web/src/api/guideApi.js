@@ -22,6 +22,13 @@ export const searchGuidesByLanguage = (language) =>
   axiosClient.get("/guides/search", { params: { language } }).then((r) => r.data);
 
 /**
+ * Search guides by operating area/destination (public).
+ * @param {string} location - e.g. "Sigiriya", "Kandy"
+ */
+export const searchGuidesByLocation = (location) =>
+  axiosClient.get("/guides/search-location", { params: { location } }).then((r) => r.data);
+
+/**
  * Update a guide's profile fields (TOUR_GUIDE own / ADMIN).
  * @param {number} id - guide profile ID
  * @param {{ languages, skills, certifications, yearsExperience }} data

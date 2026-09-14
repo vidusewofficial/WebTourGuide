@@ -53,6 +53,12 @@ public class TourGuideService {
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    public List<TourGuideResponse> searchByLocation(String location) {
+        log.debug("Searching tour guides by location='{}'", location);
+        return repository.findByLocationContainingIgnoreCase(location)
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
     @Transactional
     public TourGuideResponse create(TourGuideCreateRequest req) {
         log.info("Creating guide profile for userId={}", req.getUserId());
@@ -64,7 +70,7 @@ public class TourGuideService {
             throw new IllegalStateException("This user already has a guide profile");
         TourGuide guide = TourGuide.builder()
                 .user(user).languages(req.getLanguages()).skills(req.getSkills())
-                .certifications(req.getCertifications())
+                .certifications(req.getCertifications()).location(req.getLocation())
                 .yearsExperience(req.getYearsExperience() == null ? 0 : req.getYearsExperience())
                 .isAvailable(true).rating(0.0).build();
         TourGuideResponse saved = toResponse(repository.save(guide));
@@ -80,6 +86,7 @@ public class TourGuideService {
         if (req.getLanguages() != null) guide.setLanguages(req.getLanguages());
         if (req.getSkills() != null) guide.setSkills(req.getSkills());
         if (req.getCertifications() != null) guide.setCertifications(req.getCertifications());
+        if (req.getLocation() != null) guide.setLocation(req.getLocation());
         if (req.getYearsExperience() != null) guide.setYearsExperience(req.getYearsExperience());
         return toResponse(repository.save(guide));
     }
@@ -121,7 +128,8 @@ public class TourGuideService {
                 .id(g.getId()).userId(g.getUser().getId())
                 .fullName(g.getUser().getFullName()).email(g.getUser().getEmail())
                 .languages(g.getLanguages()).skills(g.getSkills())
-                .certifications(g.getCertifications()).yearsExperience(g.getYearsExperience())
+                .certifications(g.getCertifications()).location(g.getLocation())
+                .yearsExperience(g.getYearsExperience())
                 .isAvailable(g.getIsAvailable()).rating(g.getRating()).build();
     }
 }

@@ -301,6 +301,42 @@ export default function DestinationDetail() {
               </Link>
             </div>
 
+            {/* Tour Guides for this destination */}
+            <div className="bg-white p-4 rounded shadow-sm mb-4">
+              <h4 className="font-weight-bold mb-2" style={{ color: "#01122a" }}>
+                Tour Guides Here
+              </h4>
+              <p className="text-muted" style={{ fontSize: "14px" }}>
+                Find certified guides who operate in and around {destination.name}.
+              </p>
+              <hr />
+              <Link
+                to={`/guides?location=${encodeURIComponent(destination.location || destination.name)}`}
+                className="btn-nav-custom d-block text-center"
+              >
+                Find Guides for {destination.name} &rarr;
+              </Link>
+            </div>
+
+            {/* Add to Trip Plan */}
+            {(!user || user.role === "TOURIST") && (
+              <div className="bg-white p-4 rounded shadow-sm mb-4">
+                <h4 className="font-weight-bold mb-2" style={{ color: "#01122a" }}>
+                  Plan Your Visit
+                </h4>
+                <p className="text-muted" style={{ fontSize: "14px" }}>
+                  Add {destination.name} to one of your trip itineraries.
+                </p>
+                <hr />
+                <Link
+                  to={`/trips?addDestinationId=${destination.id}&addDestinationName=${encodeURIComponent(destination.name)}`}
+                  className="btn-outline-custom d-block text-center"
+                >
+                  + Add to Trip Plan
+                </Link>
+              </div>
+            )}
+
             {/* Quick Contact Box */}
             <div className="p-4 rounded text-white" style={{ backgroundColor: "#01122a" }}>
               <h5 className="font-weight-bold text-white mb-2">Need Assistance?</h5>

@@ -28,7 +28,9 @@ export function AuthProvider({ children }) {
     }
 
     const userData = {
+      id: res.id,
       fullName: res.fullName || res.name || "User",
+      email: res.email,
       role: res.role || "TOURIST",
     };
 

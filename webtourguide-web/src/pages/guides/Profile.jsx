@@ -17,7 +17,10 @@ export default function GuideProfile() {
   const canEdit =
     user &&
     (user.role === "ADMIN" ||
-      (user.role === "TOUR_GUIDE" && user.fullName === guide?.fullName));
+      (user.role === "TOUR_GUIDE" &&
+        user.email &&
+        guide?.email &&
+        user.email.toLowerCase() === guide.email.toLowerCase()));
   const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
 
   async function loadGuide() {
@@ -135,8 +138,10 @@ export default function GuideProfile() {
                   🧭
                 </div>
                 <h2 className="text-white font-weight-bold mb-1">{guide.fullName}</h2>
-                <p className="text-white-50 mb-2" style={{ fontSize: "14px" }}><a href={`mailto:${guide.email}</a>`} style={{color:"inherit"}}>
-                  {guide.email}</a>
+                <p className="text-white-50 mb-2" style={{ fontSize: "14px" }}>
+                  <a href={`mailto:${guide.email}`} style={{ color: "inherit" }}>
+                    {guide.email}
+                  </a>
                 </p>
                 <span
                   className={`badge ${guide.isAvailable ? "badge-success" : "badge-secondary"}`}
@@ -165,6 +170,12 @@ export default function GuideProfile() {
                     Rating
                   </h6>
                   <p className="text-dark font-weight-bold mb-0">⭐ {guide.rating?.toFixed(1) ?? "0.0"} / 5.0</p>
+                </div>
+                <div className="col-md-6 mb-4">
+                  <h6 className="font-weight-bold text-muted mb-1" style={{ textTransform: "uppercase", fontSize: "12px", letterSpacing: "0.5px" }}>
+                    Operating Area
+                  </h6>
+                  <p className="text-dark font-weight-bold mb-0">{guide.location || "—"}</p>
                 </div>
               </div>
 
@@ -238,8 +249,19 @@ export default function GuideProfile() {
             <div className="p-4 rounded text-white" style={{ backgroundColor: "#01122a" }}>
               <h5 className="font-weight-bold text-white mb-2">Ready to Book?</h5>
               <p style={{ fontSize: "14px", color: "#ccc" }}>
-                Contact our travel team to arrange a guided tour with {guide.fullName}.
+                {guide.isAvailable
+                  ? `Hire ${guide.fullName} as your guide for an upcoming tour.`
+                  : `${guide.fullName} is not currently available — contact our team to check upcoming availability.`}
               </p>
+              {guide.isAvailable && (!user || user.role === "TOURIST") && (
+                <Link
+                  to={`/bookings/new?guideId=${guide.id}`}
+                  className="btn-nav-custom d-block text-center mb-3"
+                  style={{ backgroundColor: "#f07b26", borderColor: "#f07b26" }}
+                >
+                  🧭 Hire This Guide
+                </Link>
+              )}
               <div className="d-flex align-items-center mt-3">
                 <img
                   src="/images/call.png"
