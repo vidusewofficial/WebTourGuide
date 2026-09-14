@@ -177,4 +177,12 @@ class SupportTicketControllerTest {
                         .content("{\"status\":\"RESOLVED\"}"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void getMy_returns403WithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/api/support/tickets/my"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
+    }
 }
