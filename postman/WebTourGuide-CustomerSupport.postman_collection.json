@@ -167,6 +167,22 @@
           "response": []
         },
         {
+          "name": "Create Ticket (General Inquiry)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"INQUIRY\",\n  \"subject\": \"Question about Sigiriya tour timing\",\n  \"message\": \"What time does the Sigiriya day tour usually start?\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get My Tickets",
           "request": {
             "method": "GET",
