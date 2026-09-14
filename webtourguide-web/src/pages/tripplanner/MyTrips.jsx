@@ -74,6 +74,41 @@ export default function MyTrips() {
     }
   }
 
+  /** Appends the destination from the query string as the next day of `trip`, then opens the editor. */
+  async function addDestinationToTrip(trip) {
+    setAddingTripId(trip.id);
+    setError("");
+    try {
+      const existingItems = trip.items || [];
+      const nextDay =
+        existingItems.length > 0
+          ? Math.max(...existingItems.map((i) => Number(i.dayNumber) || 0)) + 1
+          : 1;
+      const items = [
+        ...existingItems.map((i) => ({
+          destinationId: i.destinationId || null,
+          dayNumber: i.dayNumber,
+          accommodation: i.accommodation || null,
+          transportation: i.transportation || null,
+          activities: i.activities || null,
+          notes: i.notes || null,
+        })),
+        { destinationId: Number(addDestinationId), dayNumber: nextDay },
+      ];
+      await updateTripPlan(trip.id, {
+        title: trip.title,
+        startDate: trip.startDate,
+        endDate: trip.endDate,
+        items,
+      });
+      navigate(`/trips/${trip.id}`);
+    } catch (err) {
+      setError(err?.response?.data?.error || "Failed to add destination to this trip.");
+    } finally {
+      setAddingTripId(null);
+    }
+  }
+
   async function handleDelete(id) {
     if (!window.confirm("Delete this trip plan? This cannot be undone.")) return;
     try {
