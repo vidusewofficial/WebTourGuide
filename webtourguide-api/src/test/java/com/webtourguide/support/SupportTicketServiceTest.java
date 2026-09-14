@@ -297,4 +297,15 @@ class SupportTicketServiceTest {
         assertThat(response.getStatus()).isEqualTo("OPEN");
         assertThat(response.getHandledById()).isNull();
     }
+
+    @Test
+    void getAll_returnsResponsesWithHandledByNamePopulated() {
+        SupportTicket ticket = ticketRaisedBy(tourist, 15L);
+        ticket.setHandledBy(staff);
+        when(repository.findAll()).thenReturn(List.of(ticket));
+
+        List<SupportTicketResponse> results = service.getAll(null);
+
+        assertThat(results.get(0).getHandledByName()).isEqualTo(staff.getFullName());
+    }
 }
