@@ -109,3 +109,15 @@ automatically assigns `handledBy` to the caller. Moving to RESOLVED or CLOSED st
 | 403 on every `/api/support/tickets` call | Logged in as TOURIST calling a STAFF/ADMIN-only endpoint | Use a STAFF or ADMIN token for `GET /tickets` and the status update endpoint |
 | 403 viewing a specific ticket | Viewing another tourist's ticket | Expected — only the raiser, STAFF, or ADMIN can view a ticket |
 | `handledBy` stays null after a status change | Status update failed validation before reaching the service | Confirm the request body has a valid `status` enum value |
+
+---
+
+## Role Access Matrix
+
+| Endpoint | TOURIST | STAFF | ADMIN |
+|----------|---------|-------|-------|
+| POST /tickets | ✅ (own) | ❌ | ❌ |
+| GET /tickets/my | ✅ (own) | ❌ | ❌ |
+| GET /tickets/{id} | ✅ (own only) | ✅ | ✅ |
+| GET /tickets | ❌ | ✅ | ✅ |
+| PATCH /tickets/{id}/status | ❌ | ✅ | ✅ |
