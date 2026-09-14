@@ -19,6 +19,10 @@ public class SupportTicket {
     @ManyToOne @JoinColumn(name = "handled_by")
     private User handledBy;
 
+    /** Optional booking this request relates to (e.g. a cancellation/reschedule request). */
+    @ManyToOne @JoinColumn(name = "booking_id")
+    private Booking booking;
+
     @Enumerated(EnumType.STRING)
     private TicketType type;
 
