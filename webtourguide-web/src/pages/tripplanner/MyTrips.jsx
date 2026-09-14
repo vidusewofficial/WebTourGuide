@@ -326,22 +326,43 @@ export default function MyTrips() {
                 )}
 
                 <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-                  <Link
-                    to={`/trips/${t.id}`}
-                    style={{
-                      flex: 1,
-                      textAlign: "center",
-                      background: "#0c1730",
-                      color: "#fff",
-                      padding: "8px 0",
-                      borderRadius: 8,
-                      textDecoration: "none",
-                      fontSize: 13,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Edit Itinerary
-                  </Link>
+                  {addDestinationId ? (
+                    <button
+                      onClick={() => addDestinationToTrip(t)}
+                      disabled={addingTripId === t.id}
+                      style={{
+                        flex: 1,
+                        textAlign: "center",
+                        background: addingTripId === t.id ? "#9ca3af" : "#f07b26",
+                        color: "#fff",
+                        border: "none",
+                        padding: "8px 0",
+                        borderRadius: 8,
+                        fontSize: 13,
+                        fontWeight: 600,
+                        cursor: addingTripId === t.id ? "not-allowed" : "pointer",
+                      }}
+                    >
+                      {addingTripId === t.id ? "Adding..." : `+ Add ${addDestinationName || "Here"}`}
+                    </button>
+                  ) : (
+                    <Link
+                      to={`/trips/${t.id}`}
+                      style={{
+                        flex: 1,
+                        textAlign: "center",
+                        background: "#0c1730",
+                        color: "#fff",
+                        padding: "8px 0",
+                        borderRadius: 8,
+                        textDecoration: "none",
+                        fontSize: 13,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Edit Itinerary
+                    </Link>
+                  )}
                   <button
                     onClick={() => handleDelete(t.id)}
                     style={{
