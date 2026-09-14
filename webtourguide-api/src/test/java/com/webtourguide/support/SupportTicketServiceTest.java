@@ -281,4 +281,20 @@ class SupportTicketServiceTest {
 
         assertThat(results.get(0).getRaisedByName()).isEqualTo(tourist.getFullName());
     }
+
+    @Test
+    void create_defaultsStatusToOpen() {
+        when(userRepository.findByEmail(tourist.getEmail())).thenReturn(Optional.of(tourist));
+        when(repository.save(any(SupportTicket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        SupportTicketCreateRequest req = new SupportTicketCreateRequest();
+        req.setType(TicketType.INQUIRY);
+        req.setSubject("Question about pickup time");
+        req.setMessage("What time will the driver arrive?");
+
+        SupportTicketResponse response = service.create(req, auth);
+
+        assertThat(response.getStatus()).isEqualTo("OPEN");
+        assertThat(response.getHandledById()).isNull();
+    }
 }
