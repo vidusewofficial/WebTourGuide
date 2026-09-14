@@ -230,4 +230,13 @@ class SupportTicketServiceTest {
         assertThat(response.getStatus()).isEqualTo("CLOSED");
         assertThat(response.getResolvedAt()).isNotNull();
     }
+
+    @Test
+    void getAll_returnsEmptyList_whenNoTicketsExist() {
+        when(repository.findAll()).thenReturn(List.of());
+
+        List<SupportTicketResponse> results = service.getAll(null);
+
+        assertThat(results).isEmpty();
+    }
 }
