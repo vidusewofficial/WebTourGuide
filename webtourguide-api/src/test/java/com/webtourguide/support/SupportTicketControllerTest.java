@@ -226,4 +226,15 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "staff@example.com", roles = "STAFF")
+    void updateStatus_returns400WhenStatusIsMissing() throws Exception {
+        mockMvc.perform(patch("/api/support/tickets/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
 }
