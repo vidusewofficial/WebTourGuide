@@ -179,4 +179,14 @@ class SupportTicketServiceTest {
         verify(repository).findByStatus(TicketStatus.OPEN);
         verify(repository, never()).findAll();
     }
+
+    @Test
+    void getMy_returnsEmptyList_whenTouristHasNoTickets() {
+        when(userRepository.findByEmail(tourist.getEmail())).thenReturn(Optional.of(tourist));
+        when(repository.findByRaisedById(tourist.getId())).thenReturn(List.of());
+
+        List<SupportTicketResponse> results = service.getMy(auth);
+
+        assertThat(results).isEmpty();
+    }
 }
