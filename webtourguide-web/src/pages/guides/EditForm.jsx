@@ -26,6 +26,7 @@ export default function GuideEditForm() {
           languages: g.languages || "",
           skills: g.skills || "",
           certifications: g.certifications || "",
+          location: g.location || "",
           yearsExperience: g.yearsExperience || 0,
         });
         setIsAvailable(g.isAvailable ?? true);
