@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { createTicket } from "../../api/supportApi";
+import { getMyBookings } from "../../api/bookingApi";
 
 const TYPE_OPTIONS = [
   { value: "INQUIRY", label: "General Inquiry" },
