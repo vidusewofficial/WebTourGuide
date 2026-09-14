@@ -204,4 +204,14 @@ class SupportTicketServiceTest {
 
         assertThat(response.getHandledById()).isEqualTo(staff.getId());
     }
+
+    @Test
+    void getById_returns200WhenOwnedByCaller() {
+        SupportTicket ticket = ticketRaisedBy(tourist, 12L);
+        when(repository.findById(12L)).thenReturn(Optional.of(ticket));
+
+        SupportTicketResponse response = service.getById(12L, auth);
+
+        assertThat(response.getId()).isEqualTo(12L);
+    }
 }
