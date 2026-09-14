@@ -282,38 +282,23 @@ export default function DestinationDetail() {
             </div>
           </div>
 
-          {/* Sidebar Booking & Guide Card */}
+          {/* Sidebar */}
           <div className="col-lg-4">
+            {/* Tour Packages for this destination */}
             <div className="bg-white p-4 rounded shadow-sm mb-4">
-              <h4 className="font-weight-bold mb-3" style={{ color: "#01122a" }}>
-                Book This Tour
+              <h4 className="font-weight-bold mb-2" style={{ color: "#01122a" }}>
+                Available Tour Packages
               </h4>
               <p className="text-muted" style={{ fontSize: "14px" }}>
-                Plan your travel itinerary with our local certified guides.
+                Explore curated multi-day itineraries that include {destination.name}.
               </p>
-
               <hr />
-
-              <div className="mb-3">
-                <span className="text-muted d-block" style={{ fontSize: "13px" }}>
-                  Destination:
-                </span>
-                <strong className="text-dark">{destination.name}</strong>
-              </div>
-
-              <div className="mb-4">
-                <span className="text-muted d-block" style={{ fontSize: "13px" }}>
-                  Location:
-                </span>
-                <strong className="text-dark">{destination.location}</strong>
-              </div>
-
-              <button
-                className="tripbiz-btn-primary mb-2"
-                onClick={() => alert("Tour booking inquiry received! Our travel team will reach out.")}
+              <Link
+                to={`/packages?destination=${destination.id}`}
+                className="btn-nav-custom d-block text-center"
               >
-                Book Tour Now
-              </button>
+                View Packages for {destination.name} &rarr;
+              </Link>
             </div>
 
             {/* Quick Contact Box */}

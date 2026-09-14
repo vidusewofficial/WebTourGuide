@@ -51,6 +51,9 @@ CREATE TABLE tour_guides (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- Speed up availability filter queries
+CREATE INDEX idx_tour_guides_is_available ON tour_guides(is_available);
+
 CREATE TABLE bookings (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     tourist_id BIGINT NOT NULL,
@@ -83,6 +86,7 @@ CREATE TABLE trip_plan_items (
     day_number INT NOT NULL,
     accommodation VARCHAR(150),
     transportation VARCHAR(150),
+    activities VARCHAR(300),
     notes VARCHAR(500),
     FOREIGN KEY (trip_plan_id) REFERENCES trip_plans(id) ON DELETE CASCADE,
     FOREIGN KEY (destination_id) REFERENCES destinations(id)

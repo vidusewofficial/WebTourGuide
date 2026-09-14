@@ -1,0 +1,460 @@
+{
+  "info": {
+    "_postman_id": "trip-planning-management-v1",
+    "name": "WebTourGuide — Trip Planning Management",
+    "description": "Regression test set for the Trip Planning Management module.\n\nEndpoints:\n  POST   /api/trip-plans      — TOURIST only, create a new empty itinerary\n  GET    /api/trip-plans/my   — TOURIST only, list the caller's own plans\n  GET    /api/trip-plans/{id} — TOURIST only, view one plan (403 if not owner)\n  PUT    /api/trip-plans/{id} — TOURIST only, replace title/dates/items\n  DELETE /api/trip-plans/{id} — TOURIST only, delete a plan (403 if not owner)\n\nNo ADMIN or STAFF override exists for this module — every non-owner access,\nregardless of role, is rejected.\n\nNote: the 'PUT with destination' request assumes {{destinationId}} already\nexists in the database (seed one via the Destination Management module first,\nor change the variable). The main create/update flow otherwise only uses\nrest days (destinationId = null) so it runs on a fresh database.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",          "value": "http://localhost:8080",        "type": "string" },
+    { "key": "touristToken",     "value": "<paste TOURIST A JWT here>",   "type": "string" },
+    { "key": "otherTouristToken","value": "<paste TOURIST B JWT here>",   "type": "string" },
+    { "key": "adminToken",       "value": "<paste ADMIN JWT here>",       "type": "string" },
+    { "key": "tripPlanId",       "value": "1",                            "type": "string" },
+    { "key": "destinationId",    "value": "1",                            "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register Tourist A",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Nadeesha Tourist\",\n  \"email\": \"nadeesha.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register Tourist B (for ownership checks)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Dilan Tourist\",\n  \"email\": \"dilan.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Tourist A",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('touristToken', d.token);",
+                  "pm.test('role is TOURIST', () => pm.expect(d.role).to.eql('TOURIST'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nadeesha.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Tourist B",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('otherTouristToken', d.token);",
+                  "pm.test('role is TOURIST', () => pm.expect(d.role).to.eql('TOURIST'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"dilan.tourist@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as ADMIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('adminToken', d.token);",
+                  "pm.test('role is ADMIN', () => pm.expect(d.role).to.eql('ADMIN'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin.test@example.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TOURIST — Trip Plan CRUD",
+      "item": [
+        {
+          "name": "POST create trip plan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('tripPlanId', d.id);",
+                  "pm.test('items array is empty on creation', () => pm.expect(d.items).to.have.lengthOf(0));",
+                  "pm.test('title matches', () => pm.expect(d.title).to.eql('South Coast Getaway'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans", "host": ["{{baseUrl}}"], "path": ["api","trip-plans"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"startDate\": \"2026-11-10\",\n  \"endDate\": \"2026-11-13\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST create — 400 when startDate after endDate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 400', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans", "host": ["{{baseUrl}}"], "path": ["api","trip-plans"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Bad Dates Trip\",\n  \"startDate\": \"2026-11-13\",\n  \"endDate\": \"2026-11-10\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET my trip plans",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{touristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/my", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","my"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET trip plan by id (owner)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('has title', () => pm.expect(pm.response.json()).to.have.property('title'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{touristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT update itinerary (rest day, no destination)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.test('one item saved', () => pm.expect(d.items).to.have.lengthOf(1));",
+                  "pm.test('rest day has no destination', () => pm.expect(d.items[0].destinationId).to.be.null);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"startDate\": \"2026-11-10\",\n  \"endDate\": \"2026-11-13\",\n  \"items\": [\n    {\n      \"destinationId\": null,\n      \"dayNumber\": 1,\n      \"accommodation\": \"Kandy Guest House\",\n      \"transportation\": \"Train\",\n      \"activities\": \"Rest, explore town\",\n      \"notes\": \"Rest day\"\n    }\n  ]\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT update itinerary with destination (requires seeded destinationId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.test('destinationName resolved', () => pm.expect(d.items[0].destinationName).to.not.be.null);",
+                  "pm.test('activities saved', () => pm.expect(d.items[0].activities).to.eql('Climb the rock fortress, visit museum'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"items\": [\n    {\n      \"destinationId\": {{destinationId}},\n      \"dayNumber\": 1,\n      \"accommodation\": \"Sigiriya Village Hotel\",\n      \"transportation\": \"Private van\",\n      \"activities\": \"Climb the rock fortress, visit museum\",\n      \"notes\": \"Climb early to avoid heat\"\n    }\n  ]\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Ownership & Role Guards",
+      "item": [
+        {
+          "name": "POST create — 403 when ADMIN (no override for this module)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans", "host": ["{{baseUrl}}"], "path": ["api","trip-plans"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Should not be allowed\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET by id — 403 when not the owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 403 - ownership enforced', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{otherTouristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT — 403 when not the owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 403 - ownership enforced', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{otherTouristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Should not work\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT — 400 when an item is missing dayNumber",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 400 - dayNumber required', () => pm.response.to.have.status(400));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"South Coast Getaway\",\n  \"items\": [\n    {\n      \"accommodation\": \"Missing day number\"\n    }\n  ]\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE — 403 when not the owner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 403 - ownership enforced', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{otherTouristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET by id — 404 when plan does not exist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 404', () => pm.response.to.have.status(404));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{touristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/999999", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","999999"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TOURIST — Cleanup",
+      "item": [
+        {
+          "name": "DELETE trip plan (owner)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 204', () => pm.response.to.have.status(204));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{touristToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/trip-plans/{{tripPlanId}}", "host": ["{{baseUrl}}"], "path": ["api","trip-plans","{{tripPlanId}}"] }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,452 @@
+{
+  "info": {
+    "_postman_id": "tour-guide-management-v1",
+    "name": "WebTourGuide — Tour Guide Management",
+    "description": "Regression test set for the Tour Guide Management module (Section 4).\n\nEndpoints:\n  GET    /api/guides                  — Public, browse all guides\n  GET    /api/guides/{id}             — Public, view one guide\n  GET    /api/guides/available        — Public, available guides only\n  GET    /api/guides/search?language= — Public, filter by language\n  POST   /api/guides                  — ADMIN/STAFF, create guide profile\n  PUT    /api/guides/{id}             — TOUR_GUIDE (own) / ADMIN, update profile\n  PATCH  /api/guides/{id}/availability — TOUR_GUIDE (own) / ADMIN, toggle availability\n  DELETE /api/guides/{id}             — ADMIN only, remove guide listing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl",     "value": "http://localhost:8080",  "type": "string" },
+    { "key": "adminToken",  "value": "<paste ADMIN JWT here>", "type": "string" },
+    { "key": "guideToken",  "value": "<paste TOUR_GUIDE JWT here>", "type": "string" },
+    { "key": "guideId",     "value": "1",                      "type": "string" },
+    { "key": "guideUserId", "value": "3",                      "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register (tourist → will be promoted)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/register", "host": ["{{baseUrl}}"], "path": ["api","auth","register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Kasun Perera\",\n  \"email\": \"kasun.guide@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as ADMIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('adminToken', d.token);",
+                  "pm.test('role is ADMIN', () => pm.expect(d.role).to.eql('ADMIN'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin.test@example.com\",\n  \"password\": \"admin123\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login as Kasun (TOUR_GUIDE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('guideToken', d.token);",
+                  "pm.test('role is TOUR_GUIDE', () => pm.expect(d.role).to.eql('TOUR_GUIDE'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api","auth","login"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"kasun.guide@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "PUBLIC — Browse & Search",
+      "item": [
+        {
+          "name": "GET all guides",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('returns array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/guides", "host": ["{{baseUrl}}"], "path": ["api","guides"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET guide by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('has fullName', () => pm.expect(pm.response.json()).to.have.property('fullName'));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET available guides only",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "var arr = pm.response.json();",
+                  "pm.test('all isAvailable=true', () => arr.forEach(g => pm.expect(g.isAvailable).to.be.true));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/api/guides/available", "host": ["{{baseUrl}}"], "path": ["api","guides","available"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET search by language (Sinhala)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "var arr = pm.response.json();",
+                  "pm.test('results contain Sinhala', () => arr.forEach(g => pm.expect(g.languages.toLowerCase()).to.include('sinhala')));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/search?language=Sinhala",
+              "host": ["{{baseUrl}}"], "path": ["api","guides","search"],
+              "query": [{ "key": "language", "value": "Sinhala" }]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ADMIN — Create & Delete",
+      "item": [
+        {
+          "name": "POST create guide profile (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.collectionVariables.set('guideId', d.id);",
+                  "pm.test('isAvailable=true on creation', () => pm.expect(d.isAvailable).to.be.true);",
+                  "pm.test('rating=0 on creation', () => pm.expect(d.rating).to.eql(0));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/guides", "host": ["{{baseUrl}}"], "path": ["api","guides"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{guideUserId}},\n  \"languages\": \"English, Sinhala\",\n  \"skills\": \"Wildlife tours, hiking\",\n  \"certifications\": \"SLTDA Licensed Guide\",\n  \"yearsExperience\": 4\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE guide listing (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE — 403 when TOUR_GUIDE tries to delete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 403', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{guideToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}"] }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "TOUR_GUIDE — Self-Edit (ownership)",
+      "item": [
+        {
+          "name": "PUT update own profile (TOUR_GUIDE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "var d = pm.response.json();",
+                  "pm.test('yearsExperience updated', () => pm.expect(d.yearsExperience).to.eql(5));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guideToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"languages\": \"English, Sinhala, Tamil\",\n  \"skills\": \"Wildlife tours, hiking, photography\",\n  \"certifications\": \"SLTDA Licensed Guide, First Aid\",\n  \"yearsExperience\": 5\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH toggle own availability → false (TOUR_GUIDE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('isAvailable=false', () => pm.expect(pm.response.json().isAvailable).to.be.false);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guideToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}/availability", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}","availability"] },
+            "body": { "mode": "raw", "raw": "{\n  \"isAvailable\": false\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH toggle own availability → true (TOUR_GUIDE)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('isAvailable=true', () => pm.expect(pm.response.json().isAvailable).to.be.true);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guideToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}/availability", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}","availability"] },
+            "body": { "mode": "raw", "raw": "{\n  \"isAvailable\": true\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH another guide availability — expect 403 (ownership guard)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 403 - ownership enforced', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guideToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/999/availability",
+              "host": ["{{baseUrl}}"], "path": ["api","guides","999","availability"]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"isAvailable\": false\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT another guide profile — expect 403 (ownership guard)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 403 - ownership enforced', () => pm.response.to.have.status(403));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{guideToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/guides/999",
+              "host": ["{{baseUrl}}"], "path": ["api","guides","999"]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"skills\": \"Should not work\"\n}" }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "ADMIN — Override edit any guide",
+      "item": [
+        {
+          "name": "PUT update guide profile (ADMIN overrides ownership)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200 - admin can edit any profile', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"languages\": \"English, Sinhala, Tamil\",\n  \"skills\": \"Admin-edited skills\",\n  \"certifications\": \"SLTDA Licensed Guide\",\n  \"yearsExperience\": 6\n}"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH availability (ADMIN overrides ownership)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('status 200 - admin can toggle any availability', () => pm.response.to.have.status(200));"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/guides/{{guideId}}/availability", "host": ["{{baseUrl}}"], "path": ["api","guides","{{guideId}}","availability"] },
+            "body": { "mode": "raw", "raw": "{\n  \"isAvailable\": true\n}" }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
