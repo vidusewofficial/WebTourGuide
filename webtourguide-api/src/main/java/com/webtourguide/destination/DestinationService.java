@@ -4,6 +4,7 @@ import com.webtourguide.destination.dto.*;
 import com.webtourguide.exception.ResourceNotFoundException;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,6 +18,12 @@ public class DestinationService {
         this.repository = repository;
     }
 
+    /**
+     * Transactional (readOnly) so the session stays open while toResponse()
+     * lazily loads each destination's galleryUrls collection - open-in-view
+     * is disabled for this project.
+     */
+    @Transactional(readOnly = true)
     public List<DestinationResponse> getAll() {
         return repository.findAll()
                 .stream()
@@ -24,10 +31,12 @@ public class DestinationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public DestinationResponse getById(Long id) {
         return toResponse(findEntity(id));
     }
 
+    @Transactional(readOnly = true)
     public List<DestinationResponse> search(String keyword) {
         return repository.findByNameContainingIgnoreCase(keyword)
                 .stream()
@@ -35,6 +44,7 @@ public class DestinationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<DestinationResponse> filterByCategory(String category) {
         return repository.findByCategoryIgnoreCase(category)
                 .stream()
@@ -42,6 +52,7 @@ public class DestinationService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public DestinationResponse create(DestinationRequest req, Long adminUserId) {
 
         Destination d = Destination.builder()
@@ -59,6 +70,7 @@ public class DestinationService {
         return toResponse(repository.save(d));
     }
 
+    @Transactional
     public DestinationResponse update(Long id, DestinationRequest req) {
 
         Destination d = findEntity(id);
@@ -109,7 +121,11 @@ public class DestinationService {
                 .imageUrl(d.getImageUrl())
                 .latitude(d.getLatitude())
                 .longitude(d.getLongitude())
-                .galleryUrls(d.getGalleryUrls())
+                // Copy into a plain ArrayList to force-fetch this lazy collection now,
+                // while the transaction (and Hibernate session) is still open - assigning
+                // the raw Hibernate proxy would defer the fetch until Jackson serializes
+                // the response later, after the session has already closed.
+                .galleryUrls(d.getGalleryUrls() == null ? null : new java.util.ArrayList<>(d.getGalleryUrls()))
                 .build();
     }
 }
