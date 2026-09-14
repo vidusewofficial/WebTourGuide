@@ -10,8 +10,10 @@ com.webtourguide
 ├── user/            User, Role, UserRepository, AuthController (register/login)
 ├── destination/     Destination, DestinationRepository, Service, Controller
 ├── tourpackage/     TourPackage, Repository, Service, Controller
-└── tourguide/       TourGuide, Repository, Service, Controller
-    └── dto/         CreateRequest, UpdateRequest, AvailabilityRequest, Response
+├── tourguide/       TourGuide, Repository, Service, Controller
+│   └── dto/         CreateRequest, UpdateRequest, AvailabilityRequest, Response
+└── support/         SupportTicket, Repository, Service, Controller
+    └── dto/         CreateRequest, StatusUpdateRequest, Response
 ```
 
 ## Security Flow
