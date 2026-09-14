@@ -134,6 +134,19 @@ export default function GuideEditForm() {
             </div>
 
             <div className="form-group mb-3">
+              <label className="font-weight-bold text-dark mb-1">Operating Area / Destination</label>
+              <input
+                type="text"
+                disabled={saving} name="location" maxLength={150}
+                className="tripbiz-input"
+                value={form.location}
+                onChange={handleChange}
+                placeholder="e.g. Sigiriya, Kandy"
+              />
+              <small className="text-muted">Helps tourists find you from a destination page.</small>
+            </div>
+
+            <div className="form-group mb-3">
               <label className="font-weight-bold text-dark mb-1">Years of Experience <span style={{fontWeight:"normal",fontSize:"12px",color:"#888"}}>(0 - 60)</span></label>
               <input
                 type="number"
