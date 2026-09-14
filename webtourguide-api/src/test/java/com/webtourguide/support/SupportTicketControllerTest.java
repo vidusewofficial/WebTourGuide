@@ -151,4 +151,18 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "admin@example.com", roles = "ADMIN")
+    void updateStatus_returns200ForAdminRole() throws Exception {
+        SupportTicketResponse updated = sampleResponse(1L);
+        updated.setStatus("RESOLVED");
+        when(service.updateStatus(eq(1L), any(TicketStatusUpdateRequest.class), any())).thenReturn(updated);
+
+        mockMvc.perform(patch("/api/support/tickets/1/status")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"RESOLVED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RESOLVED"));
+    }
 }
