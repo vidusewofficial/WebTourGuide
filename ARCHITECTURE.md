@@ -38,4 +38,7 @@ Request → JwtAuthFilter → SecurityFilterChain → Controller → Service →
 /login, /register          Auth pages
 /admin/destinations/new    Admin form (ADMIN / STAFF — ProtectedRoute)
 /admin/packages/new        Admin form (ADMIN / STAFF — ProtectedRoute)
+/support/new               Raise a ticket (TOURIST — ProtectedRoute)
+/support/my                My support history (TOURIST — ProtectedRoute)
+/staff/support              Support queue (STAFF / ADMIN — ProtectedRoute)
 ```
