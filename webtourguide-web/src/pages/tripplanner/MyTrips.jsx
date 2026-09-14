@@ -155,6 +155,36 @@ export default function MyTrips() {
           </button>
         </div>
 
+        {/* ── Add-destination banner ── */}
+        {addDestinationId && (
+          <div
+            style={{
+              background: "#fff7ed",
+              border: "1px solid #fed7aa",
+              color: "#9a3412",
+              padding: "14px 18px",
+              borderRadius: 8,
+              marginBottom: 20,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 8,
+            }}
+          >
+            <span>
+              📍 Adding <strong>{addDestinationName || "this destination"}</strong> to a trip — pick a
+              trip below, or create a new one.
+            </span>
+            <button
+              onClick={() => setSearchParams({})}
+              style={{ background: "transparent", border: "none", color: "#9a3412", fontWeight: 600, cursor: "pointer" }}
+            >
+              ✕ Cancel
+            </button>
+          </div>
+        )}
+
         {/* ── Error banner ── */}
         {error && (
           <div style={{ background: "#fee2e2", color: "#991b1b", padding: "12px 18px", borderRadius: 8, marginBottom: 20 }}>
