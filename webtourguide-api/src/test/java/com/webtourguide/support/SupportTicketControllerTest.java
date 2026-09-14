@@ -185,4 +185,14 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "staff@example.com", roles = "STAFF")
+    void getById_returns200ForStaffViewingAnyTicket() throws Exception {
+        when(service.getById(eq(3L), any())).thenReturn(sampleResponse(3L));
+
+        mockMvc.perform(get("/api/support/tickets/3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(3));
+    }
 }
