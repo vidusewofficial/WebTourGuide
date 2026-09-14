@@ -75,9 +75,12 @@ export default function MyTickets() {
                 {tickets.length} request{tickets.length !== 1 ? "s" : ""} raised so far.
               </p>
             </div>
-            <Link to="/support/new" className="btn-nav-custom mt-3 mt-md-0">
-              + New Request
-            </Link>
+            <div className="d-flex mt-3 mt-md-0" style={{ gap: 8 }}>
+              <button onClick={refresh} className="btn-outline-custom">Refresh</button>
+              <Link to="/support/new" className="btn-nav-custom">
+                + New Request
+              </Link>
+            </div>
           </div>
 
           {loading ? (
