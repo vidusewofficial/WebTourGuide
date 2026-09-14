@@ -207,7 +207,7 @@ export default function Navbar() {
                 {/* Customer Support link — tourists raise/track requests */}
                 {user?.role === "TOURIST" && (
                   <li className={`nav-item ${location.pathname.startsWith("/support") ? "active" : ""}`}>
-                    <Link className="nav-link" to="/support/my" onClick={() => setIsNavOpen(false)}>
+                    <Link className="nav-link" to="/support/my" title="Track and raise support requests" onClick={() => setIsNavOpen(false)}>
                       Support
                     </Link>
                   </li>
@@ -216,7 +216,7 @@ export default function Navbar() {
                 {/* Support Queue link — staff/admin triage tickets */}
                 {isAdminOrStaff && (
                   <li className={`nav-item ${location.pathname === "/staff/support" ? "active" : ""}`}>
-                    <Link className="nav-link" to="/staff/support" onClick={() => setIsNavOpen(false)}>
+                    <Link className="nav-link" to="/staff/support" title="Triage tourist support tickets" onClick={() => setIsNavOpen(false)}>
                       Support Queue
                     </Link>
                   </li>
