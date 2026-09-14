@@ -22,7 +22,7 @@ tour packages, tour guides, and bookings in Sri Lanka.
 | Booking System        | `com.webtourguide.booking`              | 🔧 In progress |
 | **Customer Support Mgmt** | `com.webtourguide.support`          | ✅ Done |
 
-See [docs/customer-support-api.md](docs/customer-support-api.md) for the full Customer Support endpoint reference.
+See [docs/customer-support-api.md](docs/customer-support-api.md) for the full Customer Support endpoint reference (5 REST endpoints).
 
 ## Milestones
 - Successfully reached 50 commits improving backend, frontend, docs, and UX!
