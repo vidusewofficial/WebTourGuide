@@ -237,4 +237,14 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "admin@example.com", roles = "ADMIN")
+    void getAll_returns200WithStatusQueryParam() throws Exception {
+        when(service.getAll(any())).thenReturn(List.of(sampleResponse(1L), sampleResponse(2L)));
+
+        mockMvc.perform(get("/api/support/tickets").param("status", "OPEN"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+    }
 }
