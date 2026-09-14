@@ -121,6 +121,9 @@ export default function NewTicket() {
                   rows={6}
                   className="tripbiz-textarea"
                 />
+                <small className="text-muted mt-1 d-block">
+                  Include your booking reference if this relates to a specific trip.
+                </small>
               </div>
 
               <button type="submit" className="tripbiz-btn-primary" disabled={loading}>
