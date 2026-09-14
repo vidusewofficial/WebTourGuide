@@ -163,4 +163,40 @@ class SupportTicketServiceTest {
         assertThat(response.getResolvedAt()).isNotNull();
         verify(userRepository, never()).findByEmail(any());
     }
+
+    @Test
+    void updateStatus_cancelsLinkedBooking_whenCancellationRequestResolved() {
+        Booking booking = Booking.builder().id(42L).status(BookingStatus.CONFIRMED).build();
+        SupportTicket ticket = ticketRaisedBy(tourist, 9L);
+        ticket.setType(TicketType.CANCELLATION_REQUEST);
+        ticket.setHandledBy(staff);
+        ticket.setBooking(booking);
+        when(repository.findById(9L)).thenReturn(Optional.of(ticket));
+        when(repository.save(any(SupportTicket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketStatusUpdateRequest req = new TicketStatusUpdateRequest();
+        req.setStatus(TicketStatus.RESOLVED);
+
+        service.updateStatus(9L, req, auth);
+
+        verify(bookingService).cancel(42L, auth);
+    }
+
+    @Test
+    void updateStatus_doesNotCancelBooking_whenAlreadyCancelled() {
+        Booking booking = Booking.builder().id(43L).status(BookingStatus.CANCELLED).build();
+        SupportTicket ticket = ticketRaisedBy(tourist, 11L);
+        ticket.setType(TicketType.CANCELLATION_REQUEST);
+        ticket.setHandledBy(staff);
+        ticket.setBooking(booking);
+        when(repository.findById(11L)).thenReturn(Optional.of(ticket));
+        when(repository.save(any(SupportTicket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        TicketStatusUpdateRequest req = new TicketStatusUpdateRequest();
+        req.setStatus(TicketStatus.RESOLVED);
+
+        service.updateStatus(11L, req, auth);
+
+        verify(bookingService, never()).cancel(any(), any());
+    }
 }
