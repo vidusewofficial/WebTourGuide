@@ -20,19 +20,33 @@ import java.util.stream.Collectors;
 public class SupportTicketService {
     private final SupportTicketRepository repository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final BookingService bookingService;
 
-    public SupportTicketService(SupportTicketRepository repository, UserRepository userRepository) {
+    public SupportTicketService(SupportTicketRepository repository, UserRepository userRepository,
+                                 BookingRepository bookingRepository, BookingService bookingService) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+        this.bookingService = bookingService;
     }
 
     public SupportTicketResponse create(SupportTicketCreateRequest req, Authentication auth) {
         User tourist = currentUser(auth);
+        Booking booking = null;
+        if (req.getBookingId() != null) {
+            booking = bookingRepository.findById(req.getBookingId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Booking " + req.getBookingId() + " not found"));
+            if (!booking.getTourist().getId().equals(tourist.getId())) {
+                throw new AccessDeniedException("You can only raise a request about your own booking");
+            }
+        }
         SupportTicket ticket = SupportTicket.builder()
                 .raisedBy(tourist)
                 .type(req.getType())
                 .subject(req.getSubject())
                 .message(req.getMessage())
+                .booking(booking)
                 .status(TicketStatus.OPEN)
                 .build();
         return toResponse(repository.save(ticket));
