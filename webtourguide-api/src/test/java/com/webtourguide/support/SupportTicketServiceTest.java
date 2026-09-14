@@ -168,4 +168,15 @@ class SupportTicketServiceTest {
         verify(repository).findAll();
         verify(repository, never()).findByStatus(any());
     }
+
+    @Test
+    void getAll_filtersByStatus_whenProvided() {
+        when(repository.findByStatus(TicketStatus.OPEN)).thenReturn(List.of(ticketRaisedBy(tourist, 1L)));
+
+        List<SupportTicketResponse> results = service.getAll(TicketStatus.OPEN);
+
+        assertThat(results).hasSize(1);
+        verify(repository).findByStatus(TicketStatus.OPEN);
+        verify(repository, never()).findAll();
+    }
 }
