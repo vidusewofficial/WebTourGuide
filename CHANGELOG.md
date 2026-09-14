@@ -5,6 +5,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+### Added — Customer Support Management Module
+- `SupportTicket` JPA entity mapped to `support_tickets` table
+- `SupportTicketRepository` with owner and status finders
+- `SupportTicketService` with ownership checks and staff auto-assignment on first status change
+- `SupportTicketController` exposing 5 REST endpoints at `/api/support/tickets`
+- DTOs: `SupportTicketCreateRequest`, `TicketStatusUpdateRequest`, `SupportTicketResponse`
+- Unit tests for `SupportTicketService` and integration tests for `SupportTicketController`
+- Frontend pages: `NewTicket`, `MyTickets`, `StaffQueue`
+- `supportApi.js` Axios helpers for all support endpoints
+- `Support` and `Support Queue` nav links in Navbar
+- 3 new React Router routes including `ProtectedRoute` for the staff queue
+- Postman collection with ownership and role regression tests
+
 ### Added — Tour Guide Management Module
 - `TourGuide` JPA entity mapped to `tour_guides` table
 - `TourGuideRepository` with availability and language search finders
