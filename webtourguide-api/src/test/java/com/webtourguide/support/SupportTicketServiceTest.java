@@ -271,4 +271,14 @@ class SupportTicketServiceTest {
         assertThat(response.getSubject()).isEqualTo("Need to reschedule Kandy trip");
         assertThat(response.getMessage()).isEqualTo("Please move our booking to next weekend.");
     }
+
+    @Test
+    void getMy_returnsResponsesWithRaisedByNamePopulated() {
+        when(userRepository.findByEmail(tourist.getEmail())).thenReturn(Optional.of(tourist));
+        when(repository.findByRaisedById(tourist.getId())).thenReturn(List.of(ticketRaisedBy(tourist, 1L)));
+
+        List<SupportTicketResponse> results = service.getMy(auth);
+
+        assertThat(results.get(0).getRaisedByName()).isEqualTo(tourist.getFullName());
+    }
 }
