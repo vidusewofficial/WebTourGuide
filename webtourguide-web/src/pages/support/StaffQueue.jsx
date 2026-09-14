@@ -106,6 +106,9 @@ export default function StaffQueue() {
                   {s.replace("_", " ")}
                 </button>
               ))}
+              <button onClick={refresh} disabled={loading} className="btn-outline-custom" style={{ padding: "6px 14px", fontSize: 13 }}>
+                Refresh
+              </button>
             </div>
           </div>
 
