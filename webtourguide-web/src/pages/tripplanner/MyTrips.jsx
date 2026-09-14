@@ -9,11 +9,20 @@ import "./tripplanner.css";
  * MyTrips page — shows all trip plans for the logged-in tourist.
  * Allows creating a new plan and deleting an existing one.
  * Click "Edit Itinerary" to go to TripEditor and add day-by-day items.
+ *
+ * Arriving here from a Destination page with ?addDestinationId=&addDestinationName=
+ * lets the tourist drop that destination straight into an existing or brand-new trip.
  */
 export default function MyTrips() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const addDestinationId = searchParams.get("addDestinationId");
+  const addDestinationName = searchParams.get("addDestinationName");
+
   const [trips, setTrips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [addingTripId, setAddingTripId] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: "", startDate: "", endDate: "" });
   const [error, setError] = useState("");
