@@ -68,7 +68,7 @@ export default function GuideProfile() {
         <div className="spinner-border text-primary" role="status">
           <span className="sr-only">Loading guide...</span>
         </div>
-        <p className="mt-3 text-muted">Loading guide profile...</p>
+        <p className="mt-3 text-muted">Loading guide profile, please wait...</p>
       </div>
     );
   }
@@ -129,14 +129,14 @@ export default function GuideProfile() {
                     alignItems: "center",
                     justifyContent: "center",
                     margin: "0 auto 16px",
-                    fontSize: "2.8rem",
+                    fontSize: "2.8rem", userSelect: "none",
                   }}
                 >
                   🧭
                 </div>
                 <h2 className="text-white font-weight-bold mb-1">{guide.fullName}</h2>
-                <p className="text-white-50 mb-2" style={{ fontSize: "14px" }}>
-                  {guide.email}
+                <p className="text-white-50 mb-2" style={{ fontSize: "14px" }}><a href={`mailto:${guide.email}</a>`} style={{color:"inherit"}}>
+                  {guide.email}</a>
                 </p>
                 <span
                   className={`badge ${guide.isAvailable ? "badge-success" : "badge-secondary"}`}
@@ -173,14 +173,14 @@ export default function GuideProfile() {
               <div className="mb-4">
                 <h5 className="font-weight-bold text-dark mb-2">Skills &amp; Specialisations</h5>
                 <p className="text-secondary" style={{ lineHeight: "1.7" }}>
-                  {guide.skills || "No skills listed."}
+                  {guide.skills || <em>No skills listed.</em>}
                 </p>
               </div>
 
               <div className="mb-4">
                 <h5 className="font-weight-bold text-dark mb-2">Certifications</h5>
                 <p className="text-secondary" style={{ lineHeight: "1.7" }}>
-                  {guide.certifications || "No certifications listed."}
+                  {guide.certifications || <em>No certifications listed.</em>}
                 </p>
               </div>
             </div>

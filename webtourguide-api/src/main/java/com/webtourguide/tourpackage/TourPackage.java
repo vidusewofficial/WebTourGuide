@@ -42,7 +42,7 @@ public class TourPackage {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "tour_package_gallery", joinColumns = @JoinColumn(name = "package_id"))
     @Column(name = "image_url")
     private List<String> galleryUrls;
