@@ -132,3 +132,11 @@ automatically assigns `handledBy` to the caller. Moving to RESOLVED or CLOSED st
 - [ ] Staff moves the ticket to `RESOLVED` and `resolvedAt` is populated
 - [ ] A second tourist gets `403 Forbidden` viewing the first tourist's ticket
 - [ ] A tourist gets `403 Forbidden` calling the status update endpoint
+
+---
+
+## Related Files
+
+- `SupportTicket`, `SupportTicketRepository`, `SupportTicketService`, `SupportTicketController` — `webtourguide-api/src/main/java/com/webtourguide/support/`
+- `supportApi.js`, `NewTicket.jsx`, `MyTickets.jsx`, `StaffQueue.jsx` — `webtourguide-web/src/`
+- `WebTourGuide-CustomerSupport.postman_collection.json` — `postman/`
