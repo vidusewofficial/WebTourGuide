@@ -11,11 +11,29 @@ const TYPE_OPTIONS = [
   { value: "RESCHEDULE_REQUEST", label: "Reschedule Request" },
 ];
 
+const BOOKING_RELATED_TYPES = ["CANCELLATION_REQUEST", "RESCHEDULE_REQUEST"];
+
 export default function NewTicket() {
-  const [form, setForm] = useState({ type: "INQUIRY", subject: "", message: "" });
+  const [searchParams] = useSearchParams();
+  const [form, setForm] = useState({
+    type: searchParams.get("type") || "INQUIRY",
+    subject: "",
+    message: "",
+    bookingId: searchParams.get("bookingId") || "",
+  });
+  const [bookings, setBookings] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const needsBooking = BOOKING_RELATED_TYPES.includes(form.type);
+
+  useEffect(() => {
+    if (needsBooking && bookings.length === 0) {
+      getMyBookings().then(setBookings).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [needsBooking]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
