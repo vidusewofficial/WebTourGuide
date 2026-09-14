@@ -87,6 +87,7 @@ CREATE TABLE trip_plan_items (
     day_number INT NOT NULL,
     accommodation VARCHAR(150),
     transportation VARCHAR(150),
+    activities VARCHAR(300),
     notes VARCHAR(500),
     FOREIGN KEY (trip_plan_id) REFERENCES trip_plans(id) ON DELETE CASCADE,
     FOREIGN KEY (destination_id) REFERENCES destinations(id)

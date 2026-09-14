@@ -16,12 +16,17 @@ import PackageList from "./pages/packages/List";
 import PackageDetail from "./pages/packages/Detail";
 import PackageCompare from "./pages/packages/Compare";
 import PackageAdminForm from "./pages/packages/AdminForm";
-import GuideList from "./pages/guides/List";
-import GuideProfile from "./pages/guides/Profile";
-import GuideEditForm from "./pages/guides/EditForm";
 import NewBooking from "./pages/bookings/NewBooking";
 import MyBookings from "./pages/bookings/MyBookings";
 import AdminAllBookings from "./pages/bookings/AdminAllBookings";
+
+// Trip Planning Management routes — Group Y2-S1-MLB-B2G2-03
+import MyTrips from "./pages/tripplanner/MyTrips";
+import TripEditor from "./pages/tripplanner/TripEditor";
+
+import GuideList from "./pages/guides/List";
+import GuideProfile from "./pages/guides/Profile";
+import GuideEditForm from "./pages/guides/EditForm";
 
 export default function App() {
   return (
@@ -42,7 +47,6 @@ export default function App() {
             <Route path="/login" element={<Auth />} />
             <Route path="/register" element={<Auth />} />
 
-
             <Route element={<ProtectedRoute allow={["TOURIST", "ADMIN", "STAFF"]} />}>
               <Route path="/bookings/new" element={<NewBooking />} />
               <Route path="/bookings/my" element={<MyBookings />} />
@@ -59,6 +63,12 @@ export default function App() {
             <Route path="/guides/:id" element={<GuideProfile />} />
             <Route element={<ProtectedRoute allow={["TOUR_GUIDE", "ADMIN"]} />}>
               <Route path="/guides/:id/edit" element={<GuideEditForm />} />
+            </Route>
+
+            {/* Trip Planning Management routes — only TOURIST role can access */}
+            <Route element={<ProtectedRoute allow={["TOURIST"]} />}>
+              <Route path="/trips" element={<MyTrips />} />
+              <Route path="/trips/:id" element={<TripEditor />} />
             </Route>
           </Routes>
         </main>
