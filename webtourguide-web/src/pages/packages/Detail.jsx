@@ -398,6 +398,15 @@ export default function PackageDetail() {
                   {pkg.destination?.name} ({pkg.destination?.location})
                 </strong>
               </div>
+              {pkg.active !== false && (!user || user.role === "TOURIST") && (
+                <Link
+                  to={`/bookings/new?packageId=${pkg.id}`}
+                  className="btn-nav-custom d-block text-center mb-2"
+                  style={{ width: "100%", backgroundColor: "#f07b26", borderColor: "#f07b26" }}
+                >
+                  Book This Package →
+                </Link>
+              )}
               <Link
                 to={`/packages/compare?ids=${pkg.id}`}
                 className="btn-outline-custom d-block text-center mt-2"
