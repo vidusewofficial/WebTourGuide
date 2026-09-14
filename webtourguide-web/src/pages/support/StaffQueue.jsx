@@ -99,8 +99,9 @@ export default function StaffQueue() {
                   key={s}
                   onClick={() => setStatusFilter(s)}
                   aria-pressed={statusFilter === s}
+                  disabled={loading}
                   className={statusFilter === s ? "btn-nav-custom" : "btn-outline-custom"}
-                  style={{ padding: "6px 14px", fontSize: 13, border: statusFilter === s ? "none" : undefined }}
+                  style={{ padding: "6px 14px", fontSize: 13, border: statusFilter === s ? "none" : undefined, opacity: loading ? 0.6 : 1 }}
                 >
                   {s.replace("_", " ")}
                 </button>
