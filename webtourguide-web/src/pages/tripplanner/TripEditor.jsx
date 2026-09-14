@@ -28,10 +28,11 @@ export default function TripEditor() {
 
   useEffect(() => {
     setLoading(true);
-    getTripPlan(id)
-      .then((p) => {
+    Promise.all([getTripPlan(id), getDestinations().catch(() => [])])
+      .then(([p, dests]) => {
         setPlan(p);
         setItems(p.items || []);
+        setDestinations(dests);
       })
       .catch(() => setError("Failed to load trip plan."))
       .finally(() => setLoading(false));
