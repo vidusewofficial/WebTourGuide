@@ -89,7 +89,7 @@ export default function StaffQueue() {
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
               <h2 className="text-dark m-0">Ticket Management</h2>
               <p className="text-muted mt-1">
-                Showing {tickets.length} {statusFilter === "ALL" ? "total" : statusFilter.toLowerCase().replace("_", " ")} ticket{tickets.length !== 1 ? "s" : ""}
+                Showing {tickets.length} {statusFilter === "ALL" ? "total" : statusFilter.toLowerCase().replace("_", " ")} ticket{tickets.length !== 1 ? "s" : ""}, newest first
               </p>
             </div>
 
