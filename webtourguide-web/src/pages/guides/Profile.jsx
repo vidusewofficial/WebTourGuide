@@ -249,8 +249,19 @@ export default function GuideProfile() {
             <div className="p-4 rounded text-white" style={{ backgroundColor: "#01122a" }}>
               <h5 className="font-weight-bold text-white mb-2">Ready to Book?</h5>
               <p style={{ fontSize: "14px", color: "#ccc" }}>
-                Contact our travel team to arrange a guided tour with {guide.fullName}.
+                {guide.isAvailable
+                  ? `Hire ${guide.fullName} as your guide for an upcoming tour.`
+                  : `${guide.fullName} is not currently available — contact our team to check upcoming availability.`}
               </p>
+              {guide.isAvailable && (!user || user.role === "TOURIST") && (
+                <Link
+                  to={`/bookings/new?guideId=${guide.id}`}
+                  className="btn-nav-custom d-block text-center mb-3"
+                  style={{ backgroundColor: "#f07b26", borderColor: "#f07b26" }}
+                >
+                  🧭 Hire This Guide
+                </Link>
+              )}
               <div className="d-flex align-items-center mt-3">
                 <img
                   src="/images/call.png"
