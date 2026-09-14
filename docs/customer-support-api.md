@@ -81,3 +81,21 @@ automatically assigns `handledBy` to the caller. Moving to RESOLVED or CLOSED st
 - `403 Forbidden` — caller is a TOURIST
 
 ---
+
+## SupportTicketResponse Schema
+
+```json
+{
+  "id": 1,
+  "raisedById": 3,
+  "raisedByName": "Vidushi Tourist",
+  "handledById": 5,
+  "handledByName": "Support Staff",
+  "type": "COMPLAINT",
+  "subject": "Guide arrived 40 minutes late",
+  "message": "Our booked guide showed up almost an hour late with no notice.",
+  "status": "IN_PROGRESS",
+  "createdAt": "2026-09-14T10:00:00",
+  "resolvedAt": null
+}
+```
