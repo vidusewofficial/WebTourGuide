@@ -157,4 +157,15 @@ class SupportTicketServiceTest {
         assertThat(response.getResolvedAt()).isNotNull();
         verify(userRepository, never()).findByEmail(any());
     }
+
+    @Test
+    void getAll_returnsAllTickets_whenNoStatusFilterGiven() {
+        when(repository.findAll()).thenReturn(List.of(ticketRaisedBy(tourist, 1L), ticketRaisedBy(otherTourist, 2L)));
+
+        List<SupportTicketResponse> results = service.getAll(null);
+
+        assertThat(results).hasSize(2);
+        verify(repository).findAll();
+        verify(repository, never()).findByStatus(any());
+    }
 }
