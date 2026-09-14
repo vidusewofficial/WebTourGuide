@@ -183,6 +183,22 @@
           "response": []
         },
         {
+          "name": "Create Ticket (Cancellation Request)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{touristToken}}" }
+            ],
+            "url": { "raw": "{{baseUrl}}/api/support/tickets", "host": ["{{baseUrl}}"], "path": ["api", "support", "tickets"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"CANCELLATION_REQUEST\",\n  \"subject\": \"Need to cancel Kandy booking\",\n  \"message\": \"A family emergency means we can no longer travel on the booked date.\"\n}"
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get My Tickets",
           "request": {
             "method": "GET",
