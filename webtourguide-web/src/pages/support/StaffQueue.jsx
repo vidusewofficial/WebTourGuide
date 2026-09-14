@@ -37,7 +37,8 @@ export default function StaffQueue() {
     setError("");
     try {
       const data = await getAllTickets(statusFilter === "ALL" ? undefined : statusFilter);
-      setTickets(data);
+      const sorted = [...data].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setTickets(sorted);
     } catch {
       setError("Could not load the support queue. Please check that the backend is running.");
     } finally {
