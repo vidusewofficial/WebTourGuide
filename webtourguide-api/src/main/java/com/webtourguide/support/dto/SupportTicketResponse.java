@@ -10,6 +10,8 @@ public class SupportTicketResponse {
     private String raisedByName;
     private Long handledById;
     private String handledByName;
+    private Long bookingId;
+    private String bookingSummary;
     private String type;
     private String subject;
     private String message;
