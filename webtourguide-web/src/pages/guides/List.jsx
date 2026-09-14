@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getGuides, getAvailableGuides, searchGuidesByLanguage, deleteGuide } from "../../api/guideApi";
+import {
+  getGuides,
+  getAvailableGuides,
+  searchGuidesByLanguage,
+  searchGuidesByLocation,
+  deleteGuide,
+} from "../../api/guideApi";
 import { useAuth } from "../../context/AuthContext";
 
 export default function GuideList() {
   const { user } = useAuth();
   const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const locationFilter = searchParams.get("location") || "";
 
   const [guides, setGuides] = useState([]);
   const [loading, setLoading] = useState(true);
