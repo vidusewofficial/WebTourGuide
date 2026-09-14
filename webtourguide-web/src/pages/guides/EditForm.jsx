@@ -155,7 +155,6 @@ export default function GuideEditForm() {
                 value={form.yearsExperience}
                 onChange={handleChange}
                 min="0" max="60"
-                max="60"
               />
             </div>
 
