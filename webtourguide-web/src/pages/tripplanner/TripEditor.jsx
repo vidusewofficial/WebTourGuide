@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { getTripPlan, updateTripPlan } from "../../api/tripPlanApi";
+import { getDestinations } from "../../api/destinationApi";
 import "./tripplanner.css";
 
 /**
