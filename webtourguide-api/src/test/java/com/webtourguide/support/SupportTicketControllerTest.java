@@ -247,4 +247,15 @@ class SupportTicketControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2));
     }
+
+    @Test
+    @WithMockUser(username = "tourist@example.com", roles = "TOURIST")
+    void create_returns400WhenMessageIsBlank() throws Exception {
+        mockMvc.perform(post("/api/support/tickets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"type\":\"COMPLAINT\",\"subject\":\"Guide arrived late\",\"message\":\"\"}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
 }
