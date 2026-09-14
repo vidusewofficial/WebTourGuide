@@ -62,3 +62,22 @@ Returns every ticket in the system, for triage. STAFF and ADMIN only.
 **Response:** `200 OK` — array of `SupportTicketResponse` objects.
 
 ---
+
+### 5. Update Ticket Status
+**PATCH** `/api/support/tickets/{id}/status`
+
+Moves a ticket to a new status. STAFF and ADMIN only. The first status change on a ticket
+automatically assigns `handledBy` to the caller. Moving to RESOLVED or CLOSED stamps `resolvedAt`.
+
+**Request body:**
+```json
+{ "status": "IN_PROGRESS" }
+```
+
+**Response:** `200 OK` — updated `SupportTicketResponse`.
+
+**Error responses:**
+- `404 Not Found` — ticket does not exist
+- `403 Forbidden` — caller is a TOURIST
+
+---
