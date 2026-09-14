@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getPackages, searchPackages, deletePackage } from "../../api/packageApi";
+import { getPackages, getPackagesByDestination, searchPackages, deletePackage } from "../../api/packageApi";
 import { useAuth } from "../../context/AuthContext";
 
 export default function PackageList() {
   const { user } = useAuth();
   const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const destinationId = searchParams.get("destination") || "";
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
