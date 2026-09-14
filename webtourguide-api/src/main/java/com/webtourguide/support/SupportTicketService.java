@@ -107,6 +107,11 @@ public class SupportTicketService {
             throw new AccessDeniedException("You can only view your own support tickets");
     }
 
+    private String bookingSummary(Booking b) {
+        String title = b.getTourPackage() != null ? b.getTourPackage().getTitle() : "Booking";
+        return "#" + b.getId() + " - " + title + " (" + b.getBookingDate() + ")";
+    }
+
     private SupportTicket findEntity(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Support ticket " + id + " not found"));
