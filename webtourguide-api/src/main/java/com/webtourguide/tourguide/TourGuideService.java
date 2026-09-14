@@ -53,6 +53,12 @@ public class TourGuideService {
                 .stream().map(this::toResponse).collect(Collectors.toList());
     }
 
+    public List<TourGuideResponse> searchByLocation(String location) {
+        log.debug("Searching tour guides by location='{}'", location);
+        return repository.findByLocationContainingIgnoreCase(location)
+                .stream().map(this::toResponse).collect(Collectors.toList());
+    }
+
     @Transactional
     public TourGuideResponse create(TourGuideCreateRequest req) {
         log.info("Creating guide profile for userId={}", req.getUserId());
