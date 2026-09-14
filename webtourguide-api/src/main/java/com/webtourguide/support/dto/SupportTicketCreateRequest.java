@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+/** Request body a tourist submits to raise a new support ticket. */
 @Data
 public class SupportTicketCreateRequest {
     @NotNull private TicketType type;
