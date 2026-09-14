@@ -108,6 +108,32 @@ export default function NewTicket() {
                 </select>
               </div>
 
+              {needsBooking && (
+                <div className="form-group mb-4">
+                  <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
+                    Related Booking <span className="text-muted" style={{ fontWeight: 400 }}>(recommended)</span>
+                  </label>
+                  <select
+                    name="bookingId"
+                    value={form.bookingId}
+                    onChange={handleChange}
+                    className="tripbiz-input"
+                    style={{ appearance: "auto" }}
+                  >
+                    <option value="">— Select the booking this relates to —</option>
+                    {bookings.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        #{b.id} — {b.packageTitle || "Booking"} — {b.bookingDate} ({b.status})
+                      </option>
+                    ))}
+                  </select>
+                  <small className="text-muted mt-1 d-block">
+                    Linking your booking lets support act on it directly — resolving a cancellation
+                    request will cancel this booking.
+                  </small>
+                </div>
+              )}
+
               <div className="form-group mb-4">
                 <label style={{ fontWeight: 600, color: "#01122a", marginBottom: 8, display: "block" }}>
                   Subject <span className="text-danger">*</span>
