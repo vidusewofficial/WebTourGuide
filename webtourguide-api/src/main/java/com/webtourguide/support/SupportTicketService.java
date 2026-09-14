@@ -1,5 +1,9 @@
 package com.webtourguide.support;
 
+import com.webtourguide.booking.Booking;
+import com.webtourguide.booking.BookingRepository;
+import com.webtourguide.booking.BookingService;
+import com.webtourguide.booking.BookingStatus;
 import com.webtourguide.exception.ResourceNotFoundException;
 import com.webtourguide.support.dto.*;
 import com.webtourguide.user.User;
@@ -16,19 +20,33 @@ import java.util.stream.Collectors;
 public class SupportTicketService {
     private final SupportTicketRepository repository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final BookingService bookingService;
 
-    public SupportTicketService(SupportTicketRepository repository, UserRepository userRepository) {
+    public SupportTicketService(SupportTicketRepository repository, UserRepository userRepository,
+                                 BookingRepository bookingRepository, BookingService bookingService) {
         this.repository = repository;
         this.userRepository = userRepository;
+        this.bookingRepository = bookingRepository;
+        this.bookingService = bookingService;
     }
 
     public SupportTicketResponse create(SupportTicketCreateRequest req, Authentication auth) {
         User tourist = currentUser(auth);
+        Booking booking = null;
+        if (req.getBookingId() != null) {
+            booking = bookingRepository.findById(req.getBookingId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Booking " + req.getBookingId() + " not found"));
+            if (!booking.getTourist().getId().equals(tourist.getId())) {
+                throw new AccessDeniedException("You can only raise a request about your own booking");
+            }
+        }
         SupportTicket ticket = SupportTicket.builder()
                 .raisedBy(tourist)
                 .type(req.getType())
                 .subject(req.getSubject())
                 .message(req.getMessage())
+                .booking(booking)
                 .status(TicketStatus.OPEN)
                 .build();
         return toResponse(repository.save(ticket));
@@ -63,6 +81,16 @@ public class SupportTicketService {
         if (newStatus == TicketStatus.RESOLVED || newStatus == TicketStatus.CLOSED) {
             ticket.setResolvedAt(LocalDateTime.now());
         }
+
+        // Resolving a cancellation request actually cancels the linked booking,
+        // so Booking Management stays in sync with Customer Support decisions.
+        if (newStatus == TicketStatus.RESOLVED
+                && ticket.getType() == TicketType.CANCELLATION_REQUEST
+                && ticket.getBooking() != null
+                && ticket.getBooking().getStatus() != BookingStatus.CANCELLED) {
+            bookingService.cancel(ticket.getBooking().getId(), auth);
+        }
+
         return toResponse(repository.save(ticket));
     }
 
@@ -79,6 +107,11 @@ public class SupportTicketService {
             throw new AccessDeniedException("You can only view your own support tickets");
     }
 
+    private String bookingSummary(Booking b) {
+        String title = b.getTourPackage() != null ? b.getTourPackage().getTitle() : "Booking";
+        return "#" + b.getId() + " - " + title + " (" + b.getBookingDate() + ")";
+    }
+
     private SupportTicket findEntity(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Support ticket " + id + " not found"));
@@ -91,6 +124,8 @@ public class SupportTicketService {
                 .raisedByName(t.getRaisedBy().getFullName())
                 .handledById(t.getHandledBy() != null ? t.getHandledBy().getId() : null)
                 .handledByName(t.getHandledBy() != null ? t.getHandledBy().getFullName() : null)
+                .bookingId(t.getBooking() != null ? t.getBooking().getId() : null)
+                .bookingSummary(t.getBooking() != null ? bookingSummary(t.getBooking()) : null)
                 .type(t.getType().name())
                 .subject(t.getSubject())
                 .message(t.getMessage())

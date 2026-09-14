@@ -139,6 +139,11 @@ export default function MyTickets() {
                       <p className="text-muted mb-2" style={{ fontSize: 13 }}>
                         {TYPE_LABELS[t.type] || t.type}
                       </p>
+                      {t.bookingSummary && (
+                        <p className="mb-2" style={{ fontSize: 12, color: "#144a9e" }}>
+                          🔗 Booking {t.bookingSummary}
+                        </p>
+                      )}
 
                       <div className="row text-center mt-3 mb-3 pt-3" style={{ borderTop: "1px solid #f0f0f0" }}>
                         <div className="col-6">

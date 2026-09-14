@@ -17,6 +17,7 @@ export default function DestinationCard({ destination, onDelete }) {
     }
   }
 
+
   return (
     <motion.div 
       className="col-md-6 col-lg-4 mb-4"

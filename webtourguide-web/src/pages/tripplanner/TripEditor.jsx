@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { getTripPlan, updateTripPlan } from "../../api/tripPlanApi";
+import { getDestinations } from "../../api/destinationApi";
 import "./tripplanner.css";
 
 /**
@@ -19,6 +20,7 @@ export default function TripEditor() {
   const navigate = useNavigate();
   const [plan, setPlan] = useState(null);
   const [items, setItems] = useState([]);
+  const [destinations, setDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -26,10 +28,11 @@ export default function TripEditor() {
 
   useEffect(() => {
     setLoading(true);
-    getTripPlan(id)
-      .then((p) => {
+    Promise.all([getTripPlan(id), getDestinations().catch(() => [])])
+      .then(([p, dests]) => {
         setPlan(p);
         setItems(p.items || []);
+        setDestinations(dests);
       })
       .catch(() => setError("Failed to load trip plan."))
       .finally(() => setLoading(false));
@@ -301,14 +304,12 @@ export default function TripEditor() {
                           marginBottom: 4,
                         }}
                       >
-                        Destination ID{" "}
+                        Destination{" "}
                         <span style={{ fontWeight: 400, color: "#9ca3af" }}>(optional)</span>
                       </label>
-                      <input
-                        type="number"
+                      <select
                         value={item.destinationId || ""}
                         onChange={(e) => updateItem(origIdx, "destinationId", e.target.value)}
-                        placeholder="Leave blank for rest day"
                         style={{
                           width: "100%",
                           padding: "8px 12px",
@@ -316,8 +317,16 @@ export default function TripEditor() {
                           border: "1.5px solid #d1d5db",
                           fontSize: 13,
                           boxSizing: "border-box",
+                          appearance: "auto",
                         }}
-                      />
+                      >
+                        <option value="">Rest day — no destination</option>
+                        {destinations.map((d) => (
+                          <option key={d.id} value={d.id}>
+                            {d.name} ({d.location})
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label

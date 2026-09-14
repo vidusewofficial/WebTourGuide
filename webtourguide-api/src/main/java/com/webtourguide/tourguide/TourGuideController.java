@@ -55,6 +55,12 @@ public class TourGuideController {
         return service.searchByLanguage(language);
     }
 
+    /** Filters guides by operating area/destination keyword (public). */
+    @GetMapping("/search-location")
+    public List<TourGuideResponse> searchByLocation(@RequestParam String location) {
+        return service.searchByLocation(location);
+    }
+
     /** Creates a guide profile linking an existing TOUR_GUIDE user (ADMIN / STAFF only). */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','STAFF')")

@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getGuides, getAvailableGuides, searchGuidesByLanguage, deleteGuide } from "../../api/guideApi";
+import {
+  getGuides,
+  getAvailableGuides,
+  searchGuidesByLanguage,
+  searchGuidesByLocation,
+  deleteGuide,
+} from "../../api/guideApi";
 import { useAuth } from "../../context/AuthContext";
 
 export default function GuideList() {
   const { user } = useAuth();
   const isAdminOrStaff = user?.role === "ADMIN" || user?.role === "STAFF";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const locationFilter = searchParams.get("location") || "";
 
   const [guides, setGuides] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -28,9 +36,28 @@ export default function GuideList() {
     }
   }
 
+  async function loadByLocation(loc) {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await searchGuidesByLocation(loc);
+      setGuides(data);
+    } catch (err) {
+      console.error("Guide location search error:", err);
+      setError("Failed to load guides for this destination.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    loadAllGuides();
-  }, []);
+    if (locationFilter) {
+      loadByLocation(locationFilter);
+    } else {
+      loadAllGuides();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locationFilter]);
 
   async function handleSearch(e) {
     e.preventDefault();
@@ -57,7 +84,11 @@ export default function GuideList() {
   function handleReset() {
     setLanguage("");
     setAvailableOnly(false);
-    loadAllGuides();
+    if (locationFilter) {
+      setSearchParams({});
+    } else {
+      loadAllGuides();
+    }
   }
 
   async function handleDelete(id) {
@@ -151,11 +182,22 @@ export default function GuideList() {
         <div className="container">
           <div className="d-flex justify-content-between align-items-center flex-wrap mb-5">
             <div className="heading_container text-left" style={{ alignItems: "flex-start" }}>
-              <h2 className="text-dark m-0">All Tour Guides <span className="badge badge-primary ml-2" style={{fontSize:"14px",verticalAlign:"middle"}}>{guides.length}</span></h2>
+              <h2 className="text-dark m-0">
+                {locationFilter ? `Guides near ${locationFilter}` : "All Tour Guides"}{" "}
+                <span className="badge badge-primary ml-2" style={{fontSize:"14px",verticalAlign:"middle"}}>{guides.length}</span>
+              </h2>
               <p className="text-muted mt-1">
-                Certified, experienced guides to accompany you on every journey across Sri Lanka.{language || availableOnly ? ` — ${guides.length} result${guides.length !== 1 ? "s" : ""} found` : ""}
+                {locationFilter
+                  ? `Guides operating in or near ${locationFilter}.`
+                  : "Certified, experienced guides to accompany you on every journey across Sri Lanka."}
+                {language || availableOnly ? ` — ${guides.length} result${guides.length !== 1 ? "s" : ""} found` : ""}
               </p>
             </div>
+            {locationFilter && (
+              <button onClick={handleReset} className="btn-outline-custom">
+                ✕ Clear destination filter
+              </button>
+            )}
           </div>
 
           {loading ? (
@@ -234,6 +276,13 @@ export default function GuideList() {
                       >
                         {g.isAvailable ? "✓ Available" : "✗ Not Available"}
                       </span>
+
+                      {g.location && (
+                        <div className="mb-2">
+                          <small className="text-muted font-weight-bold">OPERATES IN</small>
+                          <p className="mb-0 text-dark">📍 {g.location}</p>
+                        </div>
+                      )}
 
                       <div className="mb-2">
                         <small className="text-muted font-weight-bold">LANGUAGES</small>

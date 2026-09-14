@@ -22,9 +22,6 @@ tour packages, tour guides, and bookings in Sri Lanka.
 | Booking System        | `com.webtourguide.booking`              | 🔧 In progress |
 | **Customer Support Mgmt** | `com.webtourguide.support`          | ✅ Done |
 
-## Milestones
-- Successfully reached 50 commits improving backend, frontend, docs, and UX!
-
 ## Quick Start
 
 ### Backend
@@ -44,14 +41,4 @@ npm run dev
 ## API Base URL
 `http://localhost:8080/api`
 
-## Guide Module Endpoints
-| Method | Path                              | Access          |
-|--------|-----------------------------------|-----------------|
-| GET    | /api/guides                       | Public          |
-| GET    | /api/guides/{id}                  | Public          |
-| GET    | /api/guides/available             | Public          |
-| GET    | /api/guides/search?language=      | Public          |
-| POST   | /api/guides                       | ADMIN, STAFF    |
-| PUT    | /api/guides/{id}                  | TOUR_GUIDE, ADMIN |
-| PATCH  | /api/guides/{id}/availability     | TOUR_GUIDE, ADMIN |
-| DELETE | /api/guides/{id}                  | ADMIN           |
+See `API_REFERENCE.md` for the full guide-module endpoint list.
