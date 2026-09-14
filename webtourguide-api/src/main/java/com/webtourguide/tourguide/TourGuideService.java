@@ -128,7 +128,8 @@ public class TourGuideService {
                 .id(g.getId()).userId(g.getUser().getId())
                 .fullName(g.getUser().getFullName()).email(g.getUser().getEmail())
                 .languages(g.getLanguages()).skills(g.getSkills())
-                .certifications(g.getCertifications()).yearsExperience(g.getYearsExperience())
+                .certifications(g.getCertifications()).location(g.getLocation())
+                .yearsExperience(g.getYearsExperience())
                 .isAvailable(g.getIsAvailable()).rating(g.getRating()).build();
     }
 }
