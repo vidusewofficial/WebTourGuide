@@ -45,6 +45,7 @@ CREATE TABLE tour_guides (
     languages VARCHAR(255),
     skills VARCHAR(255),
     certifications VARCHAR(255),
+    location VARCHAR(150),
     years_experience INT DEFAULT 0,
     is_available BOOLEAN DEFAULT TRUE,
     rating DECIMAL(2,1) DEFAULT 0.0,
