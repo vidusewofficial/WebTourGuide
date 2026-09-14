@@ -105,5 +105,6 @@ CREATE TABLE support_tickets (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     resolved_at DATETIME,
     FOREIGN KEY (raised_by) REFERENCES users(id),
-    FOREIGN KEY (handled_by) REFERENCES users(id)
+    FOREIGN KEY (handled_by) REFERENCES users(id),
+    FOREIGN KEY (booking_id) REFERENCES bookings(id)
 );
