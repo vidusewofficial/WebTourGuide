@@ -54,6 +54,7 @@ export default function GuideEditForm() {
         languages: form.languages.trim() || null,
         skills: form.skills.trim() || null,
         certifications: form.certifications.trim() || null,
+        location: form.location.trim() || null,
         yearsExperience: form.yearsExperience ? parseInt(form.yearsExperience, 10) : 0,
       };
 
