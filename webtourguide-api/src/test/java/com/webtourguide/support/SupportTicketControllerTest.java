@@ -206,4 +206,15 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "tourist@example.com", roles = "TOURIST")
+    void create_returns400WhenTypeIsMissing() throws Exception {
+        mockMvc.perform(post("/api/support/tickets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"subject\":\"Guide arrived late\",\"message\":\"details\"}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(service);
+    }
 }
