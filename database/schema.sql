@@ -97,6 +97,7 @@ CREATE TABLE support_tickets (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     raised_by BIGINT NOT NULL,
     handled_by BIGINT,
+    booking_id BIGINT,
     type ENUM('INQUIRY','COMPLAINT','CANCELLATION_REQUEST','RESCHEDULE_REQUEST') NOT NULL,
     subject VARCHAR(200) NOT NULL,
     message TEXT,
