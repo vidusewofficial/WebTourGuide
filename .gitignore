@@ -9,6 +9,3 @@ webtourguide-api/uploads/
 webtourguide-web/node_modules/
 webtourguide-web/dist/
 webtourguide-web/.env
-
-# Old static template
-tripbiz-v.01/
