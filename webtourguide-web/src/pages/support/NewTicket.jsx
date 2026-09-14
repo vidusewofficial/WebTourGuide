@@ -96,6 +96,7 @@ export default function NewTicket() {
                   onChange={handleChange}
                   placeholder="Short summary of your request"
                   required
+                  autoFocus
                   maxLength={200}
                   className="tripbiz-input"
                 />
