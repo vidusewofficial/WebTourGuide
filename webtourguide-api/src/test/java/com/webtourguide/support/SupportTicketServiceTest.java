@@ -31,6 +31,8 @@ class SupportTicketServiceTest {
 
     @Mock private SupportTicketRepository repository;
     @Mock private UserRepository userRepository;
+    @Mock private BookingRepository bookingRepository;
+    @Mock private BookingService bookingService;
     @Mock private Authentication auth;
 
     private SupportTicketService service;
