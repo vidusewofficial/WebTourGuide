@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { createBooking } from "../../api/bookingApi";
 import axiosClient from "../../api/axiosClient";
 
 export default function NewBooking() {
+  const [searchParams] = useSearchParams();
   const [packages, setPackages] = useState([]);
   const [guides, setGuides] = useState([]);
-  const [form, setForm] = useState({ packageId: "", guideId: "", bookingDate: "", participants: 1 });
+  const [form, setForm] = useState({
+    packageId: searchParams.get("packageId") || "",
+    guideId: searchParams.get("guideId") || "",
+    bookingDate: "",
+    participants: 1,
+  });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
