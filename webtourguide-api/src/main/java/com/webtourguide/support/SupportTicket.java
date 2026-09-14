@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+/** A tourist support request tracked from OPEN through CLOSED. */
 @Entity
 @Table(name = "support_tickets")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
