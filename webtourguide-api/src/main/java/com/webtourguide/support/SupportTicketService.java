@@ -3,11 +3,13 @@ package com.webtourguide.support;
 import com.webtourguide.booking.Booking;
 import com.webtourguide.booking.BookingRepository;
 import com.webtourguide.booking.BookingService;
-import com.webtourguide.booking.BookingStatus;
 import com.webtourguide.exception.ResourceNotFoundException;
 import com.webtourguide.support.dto.*;
+import com.webtourguide.support.observer.BookingCancellationObserver;
+import com.webtourguide.support.observer.TicketStatusObserver;
 import com.webtourguide.user.User;
 import com.webtourguide.user.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,14 +23,24 @@ public class SupportTicketService {
     private final SupportTicketRepository repository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
-    private final BookingService bookingService;
 
+    /** Observer Pattern: everything that reacts to a ticket status change. */
+    private final List<TicketStatusObserver> statusObservers;
+
+    @Autowired
     public SupportTicketService(SupportTicketRepository repository, UserRepository userRepository,
-                                 BookingRepository bookingRepository, BookingService bookingService) {
+                                 BookingRepository bookingRepository, List<TicketStatusObserver> statusObservers) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
-        this.bookingService = bookingService;
+        this.statusObservers = statusObservers;
+    }
+
+    /** Convenience constructor (used by unit tests) with only the booking-cancellation observer. */
+    public SupportTicketService(SupportTicketRepository repository, UserRepository userRepository,
+                                 BookingRepository bookingRepository, BookingService bookingService) {
+        this(repository, userRepository, bookingRepository,
+                List.of(new BookingCancellationObserver(bookingService)));
     }
 
     public SupportTicketResponse create(SupportTicketCreateRequest req, Authentication auth) {
@@ -70,8 +82,20 @@ public class SupportTicketService {
         return toResponse(ticket);
     }
 
+    public void delete(Long id, Authentication auth) {
+        SupportTicket ticket = findEntity(id);
+        if (!isStaffOrAdmin(auth)) {
+            if (!ticket.getRaisedBy().getEmail().equalsIgnoreCase(auth.getName()))
+                throw new AccessDeniedException("You can only delete your own support tickets");
+            if (ticket.getStatus() != TicketStatus.OPEN)
+                throw new AccessDeniedException("Only open tickets can be deleted");
+        }
+        repository.delete(ticket);
+    }
+
     public SupportTicketResponse updateStatus(Long id, TicketStatusUpdateRequest req, Authentication auth) {
         SupportTicket ticket = findEntity(id);
+        TicketStatus previousStatus = ticket.getStatus();
         TicketStatus newStatus = req.getStatus();
 
         if (ticket.getHandledBy() == null) {
@@ -80,18 +104,21 @@ public class SupportTicketService {
         ticket.setStatus(newStatus);
         if (newStatus == TicketStatus.RESOLVED || newStatus == TicketStatus.CLOSED) {
             ticket.setResolvedAt(LocalDateTime.now());
+        } else {
+            // Reopened (OPEN / IN_PROGRESS): it is no longer resolved.
+            ticket.setResolvedAt(null);
         }
 
-        // Resolving a cancellation request actually cancels the linked booking,
-        // so Booking Management stays in sync with Customer Support decisions.
-        if (newStatus == TicketStatus.RESOLVED
-                && ticket.getType() == TicketType.CANCELLATION_REQUEST
-                && ticket.getBooking() != null
-                && ticket.getBooking().getStatus() != BookingStatus.CANCELLED) {
-            bookingService.cancel(ticket.getBooking().getId(), auth);
-        }
-
+        // Notify before saving so a failing observer (e.g. the booking cannot be
+        // cancelled) stops the ticket from being saved as resolved.
+        notifyObservers(ticket, previousStatus, auth);
         return toResponse(repository.save(ticket));
+    }
+
+    private void notifyObservers(SupportTicket ticket, TicketStatus previousStatus, Authentication auth) {
+        for (TicketStatusObserver observer : statusObservers) {
+            observer.onStatusChanged(ticket, previousStatus, auth);
+        }
     }
 
     private User currentUser(Authentication auth) {
@@ -100,11 +127,14 @@ public class SupportTicketService {
     }
 
     private void assertOwnerOrStaff(SupportTicket ticket, Authentication auth) {
-        boolean isStaffOrAdmin = auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
-                || auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STAFF"));
-        if (isStaffOrAdmin) return;
+        if (isStaffOrAdmin(auth)) return;
         if (!ticket.getRaisedBy().getEmail().equalsIgnoreCase(auth.getName()))
             throw new AccessDeniedException("You can only view your own support tickets");
+    }
+
+    private boolean isStaffOrAdmin(Authentication auth) {
+        return auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                || auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_STAFF"));
     }
 
     private String bookingSummary(Booking b) {

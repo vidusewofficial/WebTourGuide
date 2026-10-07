@@ -7,6 +7,7 @@ import {
   completeBooking,
   cancelBooking,
   rescheduleBooking,
+  deleteBooking,
 } from "../../api/bookingApi";
 
 const STATUS_META = {
@@ -69,6 +70,11 @@ export default function AdminAllBookings() {
     } catch (err) {
       setActionError(err.response?.data?.error || "Action failed. Please try again.");
     }
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Permanently delete this booking? This cannot be undone.")) return;
+    await handleAction(deleteBooking, id);
   }
 
   async function handleReschedule(id) {
@@ -203,7 +209,7 @@ export default function AdminAllBookings() {
                       {/* Actions Column */}
                       <td>
                         {b.status !== "CANCELLED" && b.status !== "COMPLETED" ? (
-                           <div className="d-flex flex-wrap gap-2" style={{ gap: 6 }}>
+                           <div className="d-flex flex-wrap gap-2" style={{ gap: 6, alignItems: "flex-start" }}>
                              {(b.status === "PENDING" || b.status === "RESCHEDULED") && (
                                <button 
                                   onClick={() => handleAction(confirmBooking, b.id)}
@@ -255,7 +261,7 @@ export default function AdminAllBookings() {
                                  >
                                    Reschedule
                                  </button>
-                                 <button 
+                                 <button
                                     onClick={() => handleAction((id) => cancelBooking(id), b.id)}
                                     className="btn btn-sm btn-outline-danger"
                                     style={{ borderRadius: 20, fontWeight: 600, fontSize: 12 }}
@@ -264,11 +270,25 @@ export default function AdminAllBookings() {
                                  </button>
                                </>
                              )}
+
+                             <button
+                                onClick={() => handleDelete(b.id)}
+                                className="btn btn-sm btn-outline-secondary"
+                                style={{ borderRadius: 20, fontWeight: 600, fontSize: 12 }}
+                                title="Permanently delete this booking"
+                             >
+                               🗑 Delete
+                             </button>
                            </div>
                         ) : (
-                           <span className="text-muted" style={{ fontStyle: "italic", fontSize: 13 }}>
-                             No actions available
-                           </span>
+                           <button
+                              onClick={() => handleDelete(b.id)}
+                              className="btn btn-sm btn-outline-secondary"
+                              style={{ borderRadius: 20, fontWeight: 600, fontSize: 12 }}
+                              title="Permanently delete this booking"
+                           >
+                             🗑 Delete
+                           </button>
                         )}
                       </td>
                     </tr>

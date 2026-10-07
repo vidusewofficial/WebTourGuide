@@ -146,7 +146,7 @@ export default function PackageDetail() {
     >
       <div className="container">
         {/* Breadcrumb */}
-        <div className="mb-4">
+        <div className="mb-4 d-flex justify-content-between align-items-center">
           <Link
             to="/packages"
             className="btn-outline-custom d-inline-flex align-items-center"
@@ -154,6 +154,15 @@ export default function PackageDetail() {
           >
             &larr; Back to Packages
           </Link>
+          {isAdminOrStaff && (
+            <Link
+              to={`/admin/packages/${pkg.id}/edit`}
+              className="btn-nav-custom d-inline-flex align-items-center"
+              style={{ fontSize: "14px", padding: "6px 16px" }}
+            >
+              Edit Package
+            </Link>
+          )}
         </div>
 
         <div className="row">

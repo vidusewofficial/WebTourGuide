@@ -31,8 +31,9 @@ public class DestinationController {
 
     @GetMapping("/search")
     public List<DestinationResponse> search(
-            @RequestParam String keyword) {
-        return service.search(keyword);
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "name") String by) {
+        return service.search(keyword, by);
     }
 
     @GetMapping("/filter")

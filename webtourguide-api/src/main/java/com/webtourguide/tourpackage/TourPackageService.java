@@ -5,10 +5,14 @@ import com.webtourguide.destination.DestinationRepository;
 import com.webtourguide.destination.dto.DestinationResponse;
 import com.webtourguide.exception.ResourceNotFoundException;
 import com.webtourguide.tourpackage.dto.*;
+import com.webtourguide.tourpackage.sorting.PackageSortContext;
+import com.webtourguide.tourpackage.sorting.PackageSortStrategy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,10 +21,16 @@ public class TourPackageService {
     private final TourPackageRepository repository;
     private final DestinationRepository destinationRepository;
 
+    /** Strategy Pattern: all package sort strategies, keyed by type ("price-asc", ...). */
+    private final Map<String, PackageSortStrategy> sortStrategies;
+
     public TourPackageService(TourPackageRepository repository,
-                              DestinationRepository destinationRepository) {
+                              DestinationRepository destinationRepository,
+                              List<PackageSortStrategy> sortStrategies) {
         this.repository = repository;
         this.destinationRepository = destinationRepository;
+        this.sortStrategies = sortStrategies.stream()
+                .collect(Collectors.toMap(PackageSortStrategy::getType, Function.identity()));
     }
 
     /**
@@ -32,6 +42,36 @@ public class TourPackageService {
     public List<TourPackageResponse> getAllActive() {
         return repository.findByActiveTrue()
                 .stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Active packages ordered by the strategy named in {@code sort}
+     * ("price-asc", "price-desc", "duration" or "newest"), chosen at runtime.
+     */
+    @Transactional(readOnly = true)
+    public List<TourPackageResponse> getAllActive(String sort) {
+        return list(sort, false);
+    }
+
+    /**
+     * Packages for the listing page: active ones only, or every package when
+     * {@code includeInactive} is set (ADMIN/STAFF managing the catalogue).
+     * {@code sort} is optional; when given it picks the sorting strategy.
+     */
+    @Transactional(readOnly = true)
+    public List<TourPackageResponse> list(String sort, boolean includeInactive) {
+        List<TourPackage> packages = includeInactive ? repository.findAll() : repository.findByActiveTrue();
+        if (sort != null && !sort.isBlank()) {
+            PackageSortStrategy strategy = sortStrategies.get(sort.trim().toLowerCase());
+            if (strategy == null) {
+                throw new IllegalStateException(
+                        "Unknown sort '" + sort + "'. Allowed: " + sortStrategies.keySet());
+            }
+            packages = new PackageSortContext(strategy).sort(packages);
+        }
+        return packages.stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -101,7 +141,9 @@ public class TourPackageService {
         pkg.setDescription(req.getDescription());
         pkg.setDurationDays(req.getDurationDays());
         pkg.setPrice(req.getPrice());
-        pkg.setMaxParticipants(req.getMaxParticipants());
+        if (req.getMaxParticipants() != null) {
+            pkg.setMaxParticipants(req.getMaxParticipants());
+        }
         if (req.getActive() != null) {
             pkg.setActive(req.getActive());
         }
@@ -115,9 +157,16 @@ public class TourPackageService {
         return toResponse(repository.save(pkg));
     }
 
+    /** Deletes a package. Blocked once it has bookings - deactivate it instead to keep the history. */
+    @Transactional
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Tour package " + id + " not found");
+        }
+        long bookings = repository.countBookings(id);
+        if (bookings > 0) {
+            throw new IllegalStateException("Cannot delete this package: it has " + bookings
+                    + " booking(s). Mark it inactive instead so it can no longer be booked.");
         }
         repository.deleteById(id);
     }

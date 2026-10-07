@@ -15,7 +15,9 @@ import java.util.List;
  * GET    /api/guides/{id}              public
  * GET    /api/guides/available         public
  * GET    /api/guides/search?language=  public
- * POST   /api/guides                   ADMIN, STAFF
+ * GET    /api/guides/eligible-users    ADMIN, STAFF
+ * POST   /api/guides/register          ADMIN, STAFF (creates user + profile)
+ * POST   /api/guides                   ADMIN, STAFF (links an existing user)
  * PUT    /api/guides/{id}              TOUR_GUIDE (own), ADMIN
  * PATCH  /api/guides/{id}/availability TOUR_GUIDE (own), ADMIN
  * DELETE /api/guides/{id}              ADMIN
@@ -49,6 +51,13 @@ public class TourGuideController {
         return service.getAvailable();
     }
 
+    /** Returns guides ranked by rating, experience or languages (public, Strategy Pattern). */
+    @GetMapping("/ranked")
+    public List<TourGuideResponse> ranked(@RequestParam(defaultValue = "rating") String by,
+                                          @RequestParam(defaultValue = "false") boolean availableOnly) {
+        return service.getRanked(by, availableOnly);
+    }
+
     /** Filters guides by spoken language keyword (public). */
     @GetMapping("/search")
     public List<TourGuideResponse> search(@RequestParam String language) {
@@ -59,6 +68,23 @@ public class TourGuideController {
     @GetMapping("/search-location")
     public List<TourGuideResponse> searchByLocation(@RequestParam String location) {
         return service.searchByLocation(location);
+    }
+
+    /** Lists TOUR_GUIDE-role users without a guide profile yet (ADMIN / STAFF only). */
+    @GetMapping("/eligible-users")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    public List<EligibleUserResponse> getEligibleUsers() {
+        return service.getEligibleUsers();
+    }
+
+    /**
+     * Creates a brand-new guide account (user + profile) in one step, so the
+     * guide can log in immediately with the given email/password (ADMIN / STAFF only).
+     */
+    @PostMapping("/register")
+    @PreAuthorize("hasAnyRole('ADMIN','STAFF')")
+    public TourGuideResponse registerNewGuide(@Valid @RequestBody TourGuideRegisterRequest req) {
+        return service.registerNewGuide(req);
     }
 
     /** Creates a guide profile linking an existing TOUR_GUIDE user (ADMIN / STAFF only). */

@@ -1,7 +1,13 @@
 import axiosClient from "./axiosClient";
 
-export const getPackages = () =>
-  axiosClient.get("/packages").then((r) => r.data);
+// includeInactive is only honoured by the backend for ADMIN/STAFF callers.
+// `sort` selects the backend sorting strategy: "price-asc" | "price-desc" | "newest" | "duration"
+export const getPackages = ({ includeInactive = false, sort = "" } = {}) => {
+  const params = {};
+  if (includeInactive) params.includeInactive = true;
+  if (sort) params.sort = sort;
+  return axiosClient.get("/packages", { params }).then((r) => r.data);
+};
 
 export const getPackage = (id) =>
   axiosClient.get(`/packages/${id}`).then((r) => r.data);

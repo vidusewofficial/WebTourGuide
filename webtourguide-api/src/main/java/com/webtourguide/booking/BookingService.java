@@ -12,6 +12,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,11 +36,21 @@ public class BookingService {
         User tourist = currentUser(auth);
         TourPackage pkg = packageRepository.findById(req.getPackageId())
                 .orElseThrow(() -> new ResourceNotFoundException("Package " + req.getPackageId() + " not found"));
+        if (Boolean.FALSE.equals(pkg.getActive())) {
+            throw new IllegalStateException("This tour package is not currently available for booking");
+        }
+        if (pkg.getMaxParticipants() != null && req.getParticipants() > pkg.getMaxParticipants()) {
+            throw new IllegalStateException(
+                    "This package allows at most " + pkg.getMaxParticipants() + " participants");
+        }
 
         TourGuide guide = null;
         if (req.getGuideId() != null) {
             guide = guideRepository.findById(req.getGuideId())
                     .orElseThrow(() -> new ResourceNotFoundException("Guide " + req.getGuideId() + " not found"));
+            if (Boolean.FALSE.equals(guide.getIsAvailable())) {
+                throw new IllegalStateException("This guide is not currently available for bookings");
+            }
         }
 
         BigDecimal totalPrice = pkg.getPrice().multiply(BigDecimal.valueOf(req.getParticipants()));
@@ -68,15 +79,14 @@ public class BookingService {
     public BookingResponse cancel(Long id, Authentication auth) {
         Booking booking = findEntity(id);
         assertOwnerOrStaff(booking, auth);
-        booking.setStatus(BookingStatus.CANCELLED);
+        booking.cancel();
         return toResponse(repository.save(booking));
     }
 
     public BookingResponse reschedule(Long id, RescheduleRequest req, Authentication auth) {
         Booking booking = findEntity(id);
         assertOwnerOrStaff(booking, auth);
-        booking.setBookingDate(req.getNewBookingDate());
-        booking.setStatus(BookingStatus.RESCHEDULED);
+        booking.reschedule(req.getNewBookingDate());
         return toResponse(repository.save(booking));
     }
 
@@ -88,20 +98,23 @@ public class BookingService {
 
     public BookingResponse confirm(Long id) {
         Booking booking = findEntity(id);
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("Cannot confirm a cancelled booking");
-        }
-        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.confirm();
         return toResponse(repository.save(booking));
     }
 
     public BookingResponse complete(Long id) {
         Booking booking = findEntity(id);
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("Cannot complete a cancelled booking");
-        }
-        booking.setStatus(BookingStatus.COMPLETED);
+        booking.complete();
         return toResponse(repository.save(booking));
+    }
+
+    /** Deletes a booking; support tickets about it are kept but no longer linked to it. */
+    @Transactional
+    public void delete(Long id, Authentication auth) {
+        Booking booking = findEntity(id);
+        assertOwnerOrStaff(booking, auth);
+        repository.detachFromSupportTickets(id);
+        repository.deleteById(id);
     }
 
     private User currentUser(Authentication auth) {

@@ -14,14 +14,16 @@ export default function PackageList() {
   const [error, setError] = useState("");
   const [keyword, setKeyword] = useState("");
   const [selected, setSelected] = useState([]);
+  // Backend sorting strategy key (Strategy Pattern); "" = stored order
+  const [sort, setSort] = useState("");
 
   const defaultImage = "/images/b-1.jpg";
 
-  async function loadAllPackages() {
+  async function loadAllPackages(sortKey = sort) {
     setLoading(true);
     setError("");
     try {
-      const data = await getPackages();
+      const data = await getPackages({ includeInactive: isAdminOrStaff, sort: sortKey });
       setPackages(data);
     } catch (err) {
       console.error("Package API error:", err);
@@ -82,6 +84,14 @@ export default function PackageList() {
     }
   }
 
+  // Changing the order asks the backend to swap its sorting strategy
+  function handleSortChange(e) {
+    const value = e.target.value;
+    setSort(value);
+    setKeyword("");
+    loadAllPackages(value);
+  }
+
   const destinationName = destinationId ? packages[0]?.destination?.name : "";
 
   async function handleDeletePackage(id) {
@@ -91,7 +101,7 @@ export default function PackageList() {
       setSelected((prev) => prev.filter((sid) => sid !== id));
     } catch (err) {
       console.error("Delete package error:", err);
-      alert("Failed to delete tour package. Please try again.");
+      alert(err.response?.data?.message || "Failed to delete tour package. Please try again.");
     }
   }
 
@@ -206,6 +216,21 @@ export default function PackageList() {
             </div>
 
             <div className="d-flex align-items-center flex-wrap mt-3 mt-md-0" style={{ gap: "10px" }}>
+              {!destinationId && (
+                <select
+                  className="form-control"
+                  style={{ width: "auto", borderRadius: "20px", fontSize: "14px" }}
+                  aria-label="Sort packages"
+                  value={sort}
+                  onChange={handleSortChange}
+                >
+                  <option value="">Sort by: Default</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="newest">Newest First</option>
+                  <option value="duration">Shortest Duration</option>
+                </select>
+              )}
               {destinationId && (
                 <button onClick={handleReset} className="btn-outline-custom">
                   ✕ Clear destination filter
@@ -237,7 +262,7 @@ export default function PackageList() {
           ) : error ? (
             <div className="alert alert-danger text-center mx-auto" style={{ maxWidth: "600px" }}>
               <p>{error}</p>
-              <button onClick={loadAllPackages} className="btn-nav-custom mt-2">
+              <button onClick={() => loadAllPackages()} className="btn-nav-custom mt-2">
                 Retry
               </button>
             </div>
@@ -314,6 +339,11 @@ export default function PackageList() {
                           style={{ color: "#01122a", fontSize: "1.2rem" }}
                         >
                           {pkg.title}
+                          {pkg.active === false && (
+                            <span className="badge badge-secondary ml-2" style={{ fontSize: "11px", verticalAlign: "middle" }}>
+                              Inactive
+                            </span>
+                          )}
                         </h4>
 
                         <div className="destination-card-location mb-2">
@@ -371,6 +401,16 @@ export default function PackageList() {
                           >
                             View Details &rarr;
                           </Link>
+                          {isAdminOrStaff && (
+                            <Link
+                              to={`/admin/packages/${pkg.id}/edit`}
+                              className="btn btn-outline-secondary"
+                              style={{ borderRadius: "20px", padding: "6px 14px", fontSize: "13px", fontWeight: "600", whiteSpace: "nowrap" }}
+                              title="Edit this package"
+                            >
+                              Edit
+                            </Link>
+                          )}
                           {user?.role === "ADMIN" && (
                             <button
                               type="button"

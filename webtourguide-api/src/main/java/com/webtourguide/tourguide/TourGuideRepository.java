@@ -1,6 +1,8 @@
 package com.webtourguide.tourguide;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,4 +51,13 @@ public interface TourGuideRepository extends JpaRepository<TourGuide, Long> {
      * @param userId the {@code users.id} foreign key
      */
     boolean existsByUserId(Long userId);
+
+    /**
+     * Number of bookings assigned to this guide. Used in {@link TourGuideService#delete}
+     * to block removing a guide that bookings still point to.
+     *
+     * @param guideId the {@code tour_guides.id} primary key
+     */
+    @Query("select count(b) from Booking b where b.guide.id = :guideId")
+    long countBookings(@Param("guideId") Long guideId);
 }

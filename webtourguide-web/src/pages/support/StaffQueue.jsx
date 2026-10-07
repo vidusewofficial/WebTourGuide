@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { getAllTickets, updateTicketStatus } from "../../api/supportApi";
+import { getAllTickets, updateTicketStatus, deleteTicket } from "../../api/supportApi";
 
 const STATUS_META = {
   OPEN:        { label: "Open",        bg: "#fff3e8", color: "#d86816", border: "#f5cba7" },
@@ -69,6 +69,17 @@ export default function StaffQueue() {
       refresh();
     } catch (err) {
       setActionError(err.response?.data?.error || "Could not update ticket status.");
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Delete this support ticket? This cannot be undone.")) return;
+    setActionError("");
+    try {
+      await deleteTicket(id);
+      refresh();
+    } catch (err) {
+      setActionError(err.response?.data?.error || "Could not delete this ticket.");
     }
   }
 
@@ -189,19 +200,28 @@ export default function StaffQueue() {
                         {t.handledByName || <span style={{ fontStyle: "italic", opacity: 0.6 }}>Unassigned</span>}
                       </td>
                       <td>
-                        {NEXT_STATUS[t.status] ? (
+                        <div className="d-flex flex-wrap" style={{ gap: 6 }}>
+                          {NEXT_STATUS[t.status] ? (
+                            <button
+                              onClick={() => handleAdvance(t.id, t.status)}
+                              className="btn btn-sm btn-primary"
+                              style={{ borderRadius: 20, fontWeight: 600, fontSize: 12, backgroundColor: "#144a9e", borderColor: "#144a9e" }}
+                            >
+                              Move to {NEXT_STATUS[t.status].replace("_", " ")}
+                            </button>
+                          ) : (
+                            <span className="text-muted" style={{ fontStyle: "italic", fontSize: 13 }}>
+                              No actions available
+                            </span>
+                          )}
                           <button
-                            onClick={() => handleAdvance(t.id, t.status)}
-                            className="btn btn-sm btn-primary"
-                            style={{ borderRadius: 20, fontWeight: 600, fontSize: 12, backgroundColor: "#144a9e", borderColor: "#144a9e" }}
+                            onClick={() => handleDelete(t.id)}
+                            className="btn btn-sm btn-outline-danger"
+                            style={{ borderRadius: 20, fontWeight: 600, fontSize: 12 }}
                           >
-                            Move to {NEXT_STATUS[t.status].replace("_", " ")}
+                            Delete
                           </button>
-                        ) : (
-                          <span className="text-muted" style={{ fontStyle: "italic", fontSize: 13 }}>
-                            No actions available
-                          </span>
-                        )}
+                        </div>
                       </td>
                     </tr>
                   ))}

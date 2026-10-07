@@ -2,7 +2,10 @@ package com.webtourguide.tripplan;
 
 import com.webtourguide.tripplan.dto.*;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -79,5 +82,20 @@ public class TripPlanController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id, Authentication auth) {
         service.delete(id, auth);
+    }
+
+    /**
+     * Downloads a plan as a file in the chosen format (Strategy Pattern).
+     * GET /api/trip-plans/{id}/export?format=text|csv|ics
+     */
+    @GetMapping("/{id}/export")
+    public ResponseEntity<String> export(@PathVariable Long id,
+                                         @RequestParam(defaultValue = "text") String format,
+                                         Authentication auth) {
+        TripPlanService.ExportedFile file = service.export(id, format, auth);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.fileName() + "\"")
+                .contentType(MediaType.parseMediaType(file.contentType() + ";charset=UTF-8"))
+                .body(file.content());
     }
 }

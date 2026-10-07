@@ -4,14 +4,19 @@ import com.webtourguide.destination.Destination;
 import com.webtourguide.destination.DestinationRepository;
 import com.webtourguide.exception.ResourceNotFoundException;
 import com.webtourguide.tripplan.dto.*;
+import com.webtourguide.tripplan.export.*;
 import com.webtourguide.user.User;
 import com.webtourguide.user.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -31,12 +36,27 @@ public class TripPlanService {
     private final UserRepository userRepository;
     private final DestinationRepository destinationRepository;
 
+    /** Strategy Pattern: all export formats, keyed by format ("text", "csv", "ics"). */
+    private final Map<String, TripPlanExportStrategy> exportStrategies;
+
+    @Autowired
     public TripPlanService(TripPlanRepository repository,
                            UserRepository userRepository,
-                           DestinationRepository destinationRepository) {
+                           DestinationRepository destinationRepository,
+                           List<TripPlanExportStrategy> exportStrategies) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.destinationRepository = destinationRepository;
+        this.exportStrategies = exportStrategies.stream()
+                .collect(Collectors.toMap(TripPlanExportStrategy::getFormat, Function.identity()));
+    }
+
+    /** Convenience constructor (used by unit tests) with the three built-in export formats. */
+    public TripPlanService(TripPlanRepository repository,
+                           UserRepository userRepository,
+                           DestinationRepository destinationRepository) {
+        this(repository, userRepository, destinationRepository, List.of(
+                new PlainTextExportStrategy(), new CsvExportStrategy(), new CalendarExportStrategy()));
     }
 
     // ── Public API ────────────────────────────────────────────────────────────
@@ -96,9 +116,16 @@ public class TripPlanService {
     public TripPlanResponse update(Long id, TripPlanUpdateRequest req, Authentication auth) {
         TripPlan plan = findEntity(id);
         assertOwner(plan, auth);
-        validateDateRange(req.getStartDate(), req.getEndDate());
+        // Validate the dates the plan will end up with, so changing only one of them
+        // cannot leave the start after the existing end (or vice versa).
+        validateDateRange(
+                req.getStartDate() != null ? req.getStartDate() : plan.getStartDate(),
+                req.getEndDate() != null ? req.getEndDate() : plan.getEndDate());
+        if (req.getTitle() != null && req.getTitle().isBlank()) {
+            throw new IllegalStateException("Trip title must not be blank");
+        }
 
-        if (req.getTitle() != null)     plan.setTitle(req.getTitle());
+        if (req.getTitle() != null)     plan.setTitle(req.getTitle().trim());
         if (req.getStartDate() != null) plan.setStartDate(req.getStartDate());
         if (req.getEndDate() != null)   plan.setEndDate(req.getEndDate());
 
@@ -138,6 +165,40 @@ public class TripPlanService {
         TripPlan plan = findEntity(id);
         assertOwner(plan, auth);
         repository.delete(plan);
+    }
+
+    /** A rendered export: file content plus how to serve it. */
+    public record ExportedFile(String content, String contentType, String fileName) {
+    }
+
+    /**
+     * Exports one of the caller's plans in the format named by {@code format}
+     * ("text", "csv" or "ics"). The format strategy is chosen at runtime.
+     *
+     * @throws IllegalStateException if the format is unknown
+     */
+    @Transactional(readOnly = true)
+    public ExportedFile export(Long id, String format, Authentication auth) {
+        TripPlan plan = findEntity(id);
+        assertOwner(plan, auth);
+        TripPlanExportStrategy strategy = exportStrategies.get(format == null ? "text" : format.trim().toLowerCase());
+        if (strategy == null) {
+            throw new IllegalStateException(
+                    "Unknown export format '" + format + "'. Allowed: " + exportStrategies.keySet());
+        }
+        // Export a detached copy with items in day order; the managed entity is left untouched.
+        TripPlan ordered = TripPlan.builder()
+                .id(plan.getId())
+                .title(plan.getTitle())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
+                .items(plan.getItems().stream()
+                        .sorted(Comparator.comparing(TripPlanItem::getDayNumber))
+                        .collect(Collectors.toList()))
+                .build();
+        TripPlanExporter exporter = new TripPlanExporter(strategy);
+        String fileName = "trip-plan-" + plan.getId() + "." + strategy.getFileExtension();
+        return new ExportedFile(exporter.export(ordered), strategy.getContentType(), fileName);
     }
 
     // ── Private helpers ────────────────────────────────────────────────────────

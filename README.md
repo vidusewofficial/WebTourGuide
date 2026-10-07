@@ -41,4 +41,15 @@ npm run dev
 ## API Base URL
 `http://localhost:8080/api`
 
-See `API_REFERENCE.md` for the full guide-module endpoint list.
+See `docs/technical/API_REFERENCE.md` for the full guide-module endpoint list.
+
+## Project Structure
+
+```
+WebTourGuide/
+├── webtourguide-api/      Spring Boot backend
+├── webtourguide-web/      React frontend
+├── database/              MySQL schema and seed data
+├── postman/               Postman collections for API testing
+└── docs/                  Coursework documents (see docs/README.md)
+```

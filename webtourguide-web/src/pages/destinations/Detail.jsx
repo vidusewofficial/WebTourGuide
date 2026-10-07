@@ -127,7 +127,7 @@ export default function DestinationDetail() {
     >
       <div className="container">
         {/* Navigation Breadcrumb */}
-        <div className="mb-4">
+        <div className="mb-4 d-flex justify-content-between align-items-center">
           <Link
             to="/destinations"
             className="btn-outline-custom d-inline-flex align-items-center"
@@ -135,6 +135,15 @@ export default function DestinationDetail() {
           >
             &larr; Back to Destinations
           </Link>
+          {isAdminOrStaff && (
+            <Link
+              to={`/admin/destinations/${destination.id}/edit`}
+              className="btn-nav-custom d-inline-flex align-items-center"
+              style={{ fontSize: "14px", padding: "6px 16px" }}
+            >
+              Edit Destination
+            </Link>
+          )}
         </div>
 
         <div className="row">

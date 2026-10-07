@@ -1,5 +1,7 @@
 package com.webtourguide.booking;
 
+import com.webtourguide.booking.state.BookingState;
+import com.webtourguide.booking.state.BookingStateFactory;
 import com.webtourguide.tourguide.TourGuide;
 import com.webtourguide.tourpackage.TourPackage;
 import com.webtourguide.user.User;
@@ -44,4 +46,19 @@ public class Booking {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) this.status = BookingStatus.PENDING;
     }
+
+    // State Pattern: this booking is the context; its status selects the state object.
+
+    /** The state object for the current status; it decides which actions are allowed. */
+    public BookingState currentState() {
+        return BookingStateFactory.of(status);
+    }
+
+    public void confirm() { currentState().confirm(this); }
+
+    public void complete() { currentState().complete(this); }
+
+    public void cancel() { currentState().cancel(this); }
+
+    public void reschedule(LocalDate newDate) { currentState().reschedule(this, newDate); }
 }

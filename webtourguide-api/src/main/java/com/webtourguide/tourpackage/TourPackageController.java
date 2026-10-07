@@ -3,6 +3,7 @@ package com.webtourguide.tourpackage;
 import com.webtourguide.tourpackage.dto.*;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,9 +18,17 @@ public class TourPackageController {
         this.service = service;
     }
 
+    /**
+     * Optional {@code sort} picks a sorting strategy (Strategy Pattern); omitted = stored order.
+     * {@code includeInactive=true} also lists deactivated packages, but only for ADMIN/STAFF.
+     */
     @GetMapping
-    public List<TourPackageResponse> getAll() {
-        return service.getAllActive();
+    public List<TourPackageResponse> getAll(@RequestParam(required = false) String sort,
+                                            @RequestParam(defaultValue = "false") boolean includeInactive,
+                                            Authentication auth) {
+        boolean canSeeInactive = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_STAFF"));
+        return service.list(sort, includeInactive && canSeeInactive);
     }
 
     @GetMapping("/{id}")

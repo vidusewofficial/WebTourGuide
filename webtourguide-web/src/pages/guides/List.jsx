@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
   getGuides,
   getAvailableGuides,
+  getRankedGuides,
   searchGuidesByLanguage,
   searchGuidesByLocation,
   deleteGuide,
@@ -21,12 +22,40 @@ export default function GuideList() {
   const [error, setError] = useState("");
   const [language, setLanguage] = useState("");
   const [availableOnly, setAvailableOnly] = useState(false);
+  // Backend ranking strategy key (Strategy Pattern); "" = default listing
+  const [rankBy, setRankBy] = useState("");
 
-  async function loadAllGuides() {
+  async function loadRanked(by, onlyAvailable) {
     setLoading(true);
     setError("");
     try {
-      const data = await getGuides();
+      const data = await getRankedGuides(by, onlyAvailable);
+      setGuides(data);
+    } catch (err) {
+      console.error("Guide ranking error:", err);
+      setError(err.response?.data?.message || "Failed to rank tour guides.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Changing the ranking asks the backend to swap its ranking strategy
+  function handleRankChange(e) {
+    const value = e.target.value;
+    setRankBy(value);
+    setLanguage("");
+    if (value) {
+      loadRanked(value, availableOnly);
+    } else {
+      loadAllGuides(availableOnly);
+    }
+  }
+
+  async function loadAllGuides(onlyAvailable = false) {
+    setLoading(true);
+    setError("");
+    try {
+      const data = onlyAvailable ? await getAvailableGuides() : await getGuides();
       setGuides(data);
     } catch (err) {
       console.error("Guide API error:", err);
@@ -60,7 +89,13 @@ export default function GuideList() {
   }, [locationFilter]);
 
   async function handleSearch(e) {
-    e.preventDefault();
+    e?.preventDefault();
+    // A language search has its own results, so it replaces the ranking
+    if (rankBy && !language.trim()) {
+      loadRanked(rankBy, availableOnly);
+      return;
+    }
+    setRankBy("");
     setLoading(true);
     setError("");
     try {
@@ -84,6 +119,7 @@ export default function GuideList() {
   function handleReset() {
     setLanguage("");
     setAvailableOnly(false);
+    setRankBy("");
     if (locationFilter) {
       setSearchParams({});
     } else {
@@ -98,7 +134,7 @@ export default function GuideList() {
       setGuides((prev) => prev.filter((g) => g.id !== id));
     } catch (err) {
       console.error("Delete guide error:", err);
-      alert("Failed to remove guide. Please try again.");
+      alert(err.response?.data?.message || "Failed to remove guide. Please try again.");
     }
   }
 
@@ -193,11 +229,32 @@ export default function GuideList() {
                 {language || availableOnly ? ` — ${guides.length} result${guides.length !== 1 ? "s" : ""} found` : ""}
               </p>
             </div>
-            {locationFilter && (
-              <button onClick={handleReset} className="btn-outline-custom">
-                ✕ Clear destination filter
-              </button>
-            )}
+            <div className="d-flex align-items-center flex-wrap" style={{ gap: "8px" }}>
+              {!locationFilter && (
+                <select
+                  className="form-control"
+                  style={{ width: "auto", borderRadius: "20px", fontSize: "14px" }}
+                  aria-label="Rank guides"
+                  value={rankBy}
+                  onChange={handleRankChange}
+                >
+                  <option value="">Rank by: Default</option>
+                  <option value="rating">Best Rated</option>
+                  <option value="experience">Most Experienced</option>
+                  <option value="languages">Most Languages</option>
+                </select>
+              )}
+              {locationFilter && (
+                <button onClick={handleReset} className="btn-outline-custom">
+                  ✕ Clear destination filter
+                </button>
+              )}
+              {isAdminOrStaff && (
+                <Link to="/admin/guides/new" className="btn-nav-custom mt-3 mt-md-0">
+                  + Add Guide
+                </Link>
+              )}
+            </div>
           </div>
 
           {loading ? (
@@ -210,7 +267,7 @@ export default function GuideList() {
           ) : error ? (
             <div className="alert alert-danger text-center mx-auto" style={{ maxWidth: "600px" }}>
               <p>{error}</p>
-              <button onClick={loadAllGuides} className="btn-nav-custom mt-2">
+              <button onClick={() => loadAllGuides()} className="btn-nav-custom mt-2">
                 Retry
               </button>
             </div>

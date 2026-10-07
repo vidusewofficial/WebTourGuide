@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getMyBookings, cancelBooking, rescheduleBooking } from "../../api/bookingApi";
+import { getMyBookings, cancelBooking, rescheduleBooking, deleteBooking } from "../../api/bookingApi";
 
 const STATUS_META = {
   PENDING:     { label: "Pending",     bg: "#fff3e8", color: "#d86816", border: "#f5cba7" },
@@ -61,6 +61,17 @@ export default function MyBookings() {
       refresh();
     } catch (err) {
       setActionError(err.response?.data?.error || "Could not cancel booking.");
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!window.confirm("Permanently delete this booking? This cannot be undone.")) return;
+    setActionError("");
+    try {
+      await deleteBooking(id);
+      refresh();
+    } catch (err) {
+      setActionError(err.response?.data?.error || "Could not delete booking.");
     }
   }
 
@@ -254,6 +265,31 @@ export default function MyBookings() {
                               </button>
                             </div>
                           )}
+                        </div>
+                      )}
+
+                      {/* Delete — always available, separate from status-based actions above */}
+                      {reschedulingId !== b.id && (
+                        <div className="mt-2 pt-2" style={{ borderTop: "1px solid #f0f0f0" }}>
+                          <button
+                            onClick={() => handleDelete(b.id)}
+                            className="text-muted"
+                            style={{
+                              width: "100%",
+                              fontSize: 12,
+                              padding: "6px 10px",
+                              borderRadius: 20,
+                              fontWeight: 600,
+                              border: "1px solid #ddd",
+                              background: "transparent",
+                              cursor: "pointer",
+                              transition: "all 0.3s",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "#c0392b"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#c0392b"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = ""; e.currentTarget.style.borderColor = "#ddd"; }}
+                          >
+                            🗑 Delete Booking
+                          </button>
                         </div>
                       )}
                     </div>

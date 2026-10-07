@@ -151,4 +151,50 @@ class SupportTicketControllerTest {
 
         verifyNoInteractions(service);
     }
+
+    @Test
+    @WithMockUser(username = "tourist@example.com", roles = "TOURIST")
+    void delete_returns200ForTouristRole() throws Exception {
+        mockMvc.perform(delete("/api/support/tickets/1"))
+                .andExpect(status().isOk());
+
+        verify(service).delete(eq(1L), any());
+    }
+
+    @Test
+    @WithMockUser(username = "staff@example.com", roles = "STAFF")
+    void delete_returns200ForStaffRole() throws Exception {
+        mockMvc.perform(delete("/api/support/tickets/1"))
+                .andExpect(status().isOk());
+
+        verify(service).delete(eq(1L), any());
+    }
+
+    @Test
+    void delete_returns403WithoutAuthentication() throws Exception {
+        mockMvc.perform(delete("/api/support/tickets/1"))
+                .andExpect(status().isForbidden());
+
+        verifyNoInteractions(service);
+    }
+
+    @Test
+    @WithMockUser(username = "tourist@example.com", roles = "TOURIST")
+    void delete_returns403WhenOwnedByAnotherTourist() throws Exception {
+        doThrow(new AccessDeniedException("You can only delete your own support tickets"))
+                .when(service).delete(eq(2L), any());
+
+        mockMvc.perform(delete("/api/support/tickets/2"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "tourist@example.com", roles = "TOURIST")
+    void delete_returns404WhenTicketDoesNotExist() throws Exception {
+        doThrow(new ResourceNotFoundException("Support ticket 99 not found"))
+                .when(service).delete(eq(99L), any());
+
+        mockMvc.perform(delete("/api/support/tickets/99"))
+                .andExpect(status().isNotFound());
+    }
 }
