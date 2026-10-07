@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext";
 export default function DestinationCard({ destination, onDelete }) {
   const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
+  const isAdminOrStaff = isAdmin || user?.role === "STAFF";
   const defaultImage = "/images/b-1.jpg";
 
   function handleDelete(e) {
@@ -78,6 +79,17 @@ export default function DestinationCard({ destination, onDelete }) {
             >
               View Details
             </Link>
+
+            {isAdminOrStaff && (
+              <Link
+                to={`/admin/destinations/${destination.id}/edit`}
+                className="btn btn-outline-primary"
+                style={{ borderRadius: "20px", padding: "6px 14px", fontSize: "13px", fontWeight: "600" }}
+                title="Edit this destination"
+              >
+                Edit
+              </Link>
+            )}
 
             {isAdmin && onDelete && (
               <button

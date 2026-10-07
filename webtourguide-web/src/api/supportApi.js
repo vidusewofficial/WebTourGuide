@@ -7,3 +7,4 @@ export const getAllTickets = (status) =>
   axiosClient.get("/support/tickets", { params: status ? { status } : {} }).then((r) => r.data);
 export const updateTicketStatus = (id, status) =>
   axiosClient.patch(`/support/tickets/${id}/status`, { status }).then((r) => r.data);
+export const deleteTicket = (id) => axiosClient.delete(`/support/tickets/${id}`).then((r) => r.data);

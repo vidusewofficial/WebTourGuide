@@ -27,11 +27,17 @@ import TripEditor from "./pages/tripplanner/TripEditor";
 import GuideList from "./pages/guides/List";
 import GuideProfile from "./pages/guides/Profile";
 import GuideEditForm from "./pages/guides/EditForm";
+import GuideCreateForm from "./pages/guides/CreateForm";
+import GuideApply from "./pages/guides/Apply";
 
 // Customer Support Management routes — Group Y2-S1-MLB-B2G2-03
 import NewTicket from "./pages/support/NewTicket";
 import MyTickets from "./pages/support/MyTickets";
 import StaffQueue from "./pages/support/StaffQueue";
+
+// Admin management routes
+import UserManagement from "./pages/admin/UserManagement";
+import GuideApplications from "./pages/admin/GuideApplications";
 
 export default function App() {
   return (
@@ -60,14 +66,28 @@ export default function App() {
             <Route element={<ProtectedRoute allow={["ADMIN", "STAFF"]} />}>
               <Route path="/admin/bookings" element={<AdminAllBookings />} />
               <Route path="/admin/destinations/new" element={<DestinationAdminForm />} />
+              <Route path="/admin/destinations/:id/edit" element={<DestinationAdminForm />} />
               <Route path="/admin/packages/new" element={<PackageAdminForm />} />
+              <Route path="/admin/packages/:id/edit" element={<PackageAdminForm />} />
             </Route>
 
             {/* Tour Guide Management routes */}
             <Route path="/guides" element={<GuideList />} />
             <Route path="/guides/:id" element={<GuideProfile />} />
+            <Route element={<ProtectedRoute allow={["ADMIN", "STAFF"]} />}>
+              <Route path="/admin/guides/new" element={<GuideCreateForm />} />
+            </Route>
             <Route element={<ProtectedRoute allow={["TOUR_GUIDE", "ADMIN"]} />}>
               <Route path="/guides/:id/edit" element={<GuideEditForm />} />
+            </Route>
+            <Route element={<ProtectedRoute allow={["TOURIST"]} />}>
+              <Route path="/guides/apply" element={<GuideApply />} />
+            </Route>
+
+            {/* Admin management routes */}
+            <Route element={<ProtectedRoute allow={["ADMIN"]} />}>
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/guide-applications" element={<GuideApplications />} />
             </Route>
 
             {/* Trip Planning Management routes — only TOURIST role can access */}

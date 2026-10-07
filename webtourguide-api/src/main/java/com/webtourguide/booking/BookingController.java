@@ -62,4 +62,10 @@ public class BookingController {
     public BookingResponse complete(@PathVariable Long id) {
         return service.complete(id);
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TOURIST','STAFF','ADMIN')")
+    public void delete(@PathVariable Long id, Authentication auth) {
+        service.delete(id, auth);
+    }
 }

@@ -6,4 +6,6 @@ import java.util.List;
 public interface SupportTicketRepository extends JpaRepository<SupportTicket, Long> {
     List<SupportTicket> findByRaisedById(Long touristId);
     List<SupportTicket> findByStatus(TicketStatus status);
+    boolean existsByRaisedById(Long userId);
+    List<SupportTicket> findByHandledById(Long userId);
 }

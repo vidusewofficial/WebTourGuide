@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { createPackage } from "../../api/packageApi";
+import { createPackage, getPackage, updatePackage } from "../../api/packageApi";
 import { getDestinations } from "../../api/destinationApi";
 
 export default function PackageAdminForm() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEdit = Boolean(id);
 
   const [form, setForm] = useState({
     destinationId: "",
@@ -22,6 +24,34 @@ export default function PackageAdminForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(isEdit);
+
+  useEffect(() => {
+    if (!isEdit) return;
+
+    async function loadExisting() {
+      setLoadingExisting(true);
+      setError("");
+      try {
+        const p = await getPackage(id);
+        setForm({
+          destinationId: p.destination?.id ?? "",
+          title: p.title || "",
+          description: p.description || "",
+          durationDays: p.durationDays ?? 1,
+          price: p.price ?? 0,
+          maxParticipants: p.maxParticipants ?? 10,
+          active: p.active !== false,
+        });
+      } catch (err) {
+        console.error("Load package error:", err);
+        setError("Failed to load tour package details.");
+      } finally {
+        setLoadingExisting(false);
+      }
+    }
+    loadExisting();
+  }, [id, isEdit]);
 
   useEffect(() => {
     async function loadDestinations() {
@@ -64,30 +94,48 @@ export default function PackageAdminForm() {
     setSubmitting(true);
 
     try {
-      await createPackage({
+      const payload = {
         destinationId: Number(form.destinationId),
         title: form.title.trim(),
         description: form.description ? form.description.trim() : "",
         durationDays: Number(form.durationDays),
         price: Number(form.price),
-        maxParticipants: Number(form.maxParticipants),
+        maxParticipants: form.maxParticipants !== "" ? Number(form.maxParticipants) : null,
         active: Boolean(form.active),
-      });
+      };
 
-      setSuccess("Tour Package created successfully!");
+      if (isEdit) {
+        // imageUrl/galleryUrls are omitted, so the backend keeps the existing photos
+        await updatePackage(id, payload);
+        setSuccess("Tour Package updated successfully!");
+      } else {
+        await createPackage(payload);
+        setSuccess("Tour Package created successfully!");
+      }
       setTimeout(() => {
-        navigate("/packages");
+        navigate(isEdit ? `/packages/${id}` : "/packages");
       }, 1200);
     } catch (err) {
-      console.error("Create package error:", err);
+      console.error(isEdit ? "Update package error:" : "Create package error:", err);
       setError(
         err.response?.data?.message ||
           err.response?.data?.error ||
-          "Failed to create tour package. Please check your inputs."
+          `Failed to ${isEdit ? "update" : "create"} tour package. Please check your inputs.`
       );
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (loadingExisting) {
+    return (
+      <div className="container text-center py-5 my-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="sr-only">Loading package...</span>
+        </div>
+        <p className="mt-3 text-muted">Loading tour package details...</p>
+      </div>
+    );
   }
 
   return (
@@ -101,7 +149,7 @@ export default function PackageAdminForm() {
     >
       <div className="container">
         <div className="tripbiz-form-card">
-          <h2>Add Tour Package</h2>
+          <h2>{isEdit ? "Edit Tour Package" : "Add Tour Package"}</h2>
 
           {error && <div className="alert alert-danger mb-4">{error}</div>}
           {success && <div className="alert alert-success mb-4">{success}</div>}
@@ -242,7 +290,7 @@ export default function PackageAdminForm() {
               className="tripbiz-btn-primary"
               disabled={submitting}
             >
-              {submitting ? "Saving Package..." : "Save Tour Package"}
+              {submitting ? "Saving Package..." : isEdit ? "Update Tour Package" : "Save Tour Package"}
             </button>
           </form>
 

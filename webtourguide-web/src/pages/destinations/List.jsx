@@ -13,6 +13,7 @@ export default function DestinationList() {
   const [error, setError] = useState("");
 
   const [keyword, setKeyword] = useState("");
+  const [searchBy, setSearchBy] = useState("any");
   const [category, setCategory] = useState("ALL");
 
   async function loadAllDestinations() {
@@ -42,7 +43,7 @@ export default function DestinationList() {
     setLoading(true);
     setError("");
     try {
-      const data = await searchDestinations(keyword.trim());
+      const data = await searchDestinations(keyword.trim(), searchBy);
       setDestinations(data);
     } catch (err) {
       console.error("Search error:", err);
@@ -83,7 +84,7 @@ export default function DestinationList() {
       setDestinations((prev) => prev.filter((d) => d.id !== id));
     } catch (err) {
       console.error("Delete error:", err);
-      alert("Failed to delete destination. Please try again.");
+      alert(err.response?.data?.message || "Failed to delete destination. Please try again.");
     }
   }
 
@@ -123,6 +124,18 @@ export default function DestinationList() {
                         value={keyword}
                         onChange={(e) => setKeyword(e.target.value)}
                       />
+                      <select
+                        className="form-control"
+                        style={{ maxWidth: "130px" }}
+                        aria-label="Search by"
+                        value={searchBy}
+                        onChange={(e) => setSearchBy(e.target.value)}
+                      >
+                        <option value="any">All fields</option>
+                        <option value="name">Name</option>
+                        <option value="location">Location</option>
+                        <option value="category">Category</option>
+                      </select>
                     </div>
                   </div>
 

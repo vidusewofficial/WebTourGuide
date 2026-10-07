@@ -43,4 +43,10 @@ public class SupportTicketController {
                                                Authentication auth) {
         return service.updateStatus(id, req, auth);
     }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('TOURIST','STAFF','ADMIN')")
+    public void delete(@PathVariable Long id, Authentication auth) {
+        service.delete(id, auth);
+    }
 }

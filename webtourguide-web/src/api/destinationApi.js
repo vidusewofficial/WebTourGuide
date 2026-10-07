@@ -6,8 +6,9 @@ export const getDestinations = () =>
 export const getDestinationById = (id) =>
   axiosClient.get(`/destinations/${id}`).then((r) => r.data);
 
-export const searchDestinations = (keyword) =>
-  axiosClient.get("/destinations/search", { params: { keyword } }).then((r) => r.data);
+// `by` selects the backend search strategy: "name" | "location" | "category" | "any"
+export const searchDestinations = (keyword, by = "name") =>
+  axiosClient.get("/destinations/search", { params: { keyword, by } }).then((r) => r.data);
 
 export const filterDestinations = (category) =>
   axiosClient.get("/destinations/filter", { params: { category } }).then((r) => r.data);

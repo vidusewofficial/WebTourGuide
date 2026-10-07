@@ -61,7 +61,7 @@ export default function GuideProfile() {
       navigate("/guides");
     } catch (err) {
       console.error("Delete guide error:", err);
-      alert("Failed to remove guide. Please try again.");
+      alert(err.response?.data?.message || "Failed to remove guide. Please try again.");
     }
   }
 

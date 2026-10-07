@@ -1,12 +1,16 @@
 package com.webtourguide.destination;
 
 import com.webtourguide.destination.dto.*;
+import com.webtourguide.destination.search.DestinationSearchContext;
+import com.webtourguide.destination.search.DestinationSearchStrategy;
 import com.webtourguide.exception.ResourceNotFoundException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -14,8 +18,14 @@ public class DestinationService {
 
     private final DestinationRepository repository;
 
-    public DestinationService(DestinationRepository repository) {
+    /** All search strategies, keyed by their type ("name", "location", ...). */
+    private final Map<String, DestinationSearchStrategy> searchStrategies;
+
+    public DestinationService(DestinationRepository repository,
+                              List<DestinationSearchStrategy> searchStrategies) {
         this.repository = repository;
+        this.searchStrategies = searchStrategies.stream()
+                .collect(Collectors.toMap(DestinationSearchStrategy::getType, Function.identity()));
     }
 
     /**
@@ -36,9 +46,14 @@ public class DestinationService {
         return toResponse(findEntity(id));
     }
 
+    /**
+     * Strategy Pattern: picks the search strategy for {@code type} at runtime
+     * and lets the context run it, instead of an if/else per search mode.
+     */
     @Transactional(readOnly = true)
-    public List<DestinationResponse> search(String keyword) {
-        return repository.findByNameContainingIgnoreCase(keyword)
+    public List<DestinationResponse> search(String keyword, String type) {
+        DestinationSearchContext context = new DestinationSearchContext(resolveStrategy(type));
+        return context.executeSearch(keyword)
                 .stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
@@ -46,10 +61,17 @@ public class DestinationService {
 
     @Transactional(readOnly = true)
     public List<DestinationResponse> filterByCategory(String category) {
-        return repository.findByCategoryIgnoreCase(category)
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        return search(category, "category");
+    }
+
+    private DestinationSearchStrategy resolveStrategy(String type) {
+        String key = type == null ? "name" : type.trim().toLowerCase();
+        DestinationSearchStrategy strategy = searchStrategies.get(key);
+        if (strategy == null) {
+            throw new IllegalStateException(
+                    "Unknown search type '" + type + "'. Allowed: " + searchStrategies.keySet());
+        }
+        return strategy;
     }
 
     @Transactional
@@ -89,6 +111,11 @@ public class DestinationService {
         return toResponse(repository.save(d));
     }
 
+    /**
+     * Deletes a destination. Blocked while tour packages still use it; trip-plan
+     * days that visit it become rest days instead of blocking the delete.
+     */
+    @Transactional
     public void delete(Long id) {
 
         if (!repository.existsById(id)) {
@@ -97,6 +124,14 @@ public class DestinationService {
             );
         }
 
+        long packages = repository.countPackages(id);
+        if (packages > 0) {
+            throw new IllegalStateException(
+                    "Cannot delete this destination: " + packages
+                            + " tour package(s) use it. Delete or move those packages first.");
+        }
+
+        repository.detachFromTripPlanItems(id);
         repository.deleteById(id);
     }
 

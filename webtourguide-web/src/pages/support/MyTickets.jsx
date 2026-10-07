@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { getMyTickets } from "../../api/supportApi";
+import { getMyTickets, deleteTicket } from "../../api/supportApi";
 
 const STATUS_META = {
   OPEN:        { label: "Open",        bg: "#fff3e8", color: "#d86816", border: "#f5cba7" },
@@ -56,6 +56,17 @@ export default function MyTickets() {
   }
 
   useEffect(() => { refresh(); }, []);
+
+  async function handleDelete(id) {
+    if (!window.confirm("Delete this support request? This cannot be undone.")) return;
+    setError("");
+    try {
+      await deleteTicket(id);
+      refresh();
+    } catch (err) {
+      setError(err.response?.data?.error || "Could not delete this request.");
+    }
+  }
 
   return (
     <motion.div
@@ -132,6 +143,18 @@ export default function MyTickets() {
                         <StatusBadge status={t.status} />
                         <span className="text-muted" style={{ fontSize: 12 }}>#{t.id}</span>
                       </div>
+
+                      {t.status === "OPEN" && (
+                        <div className="d-flex justify-content-end mb-2">
+                          <button
+                            onClick={() => handleDelete(t.id)}
+                            className="btn btn-sm btn-outline-danger"
+                            style={{ borderRadius: 20, fontWeight: 600, fontSize: 12 }}
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      )}
 
                       <h5 className="font-weight-bold mb-1" style={{ color: "#01122a" }}>
                         {t.subject}

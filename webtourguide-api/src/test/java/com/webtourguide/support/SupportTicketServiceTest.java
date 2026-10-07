@@ -183,6 +183,57 @@ class SupportTicketServiceTest {
     }
 
     @Test
+    void delete_removesOwnOpenTicket() {
+        SupportTicket ticket = ticketRaisedBy(tourist, 12L);
+        when(repository.findById(12L)).thenReturn(Optional.of(ticket));
+
+        service.delete(12L, auth);
+
+        verify(repository).delete(ticket);
+    }
+
+    @Test
+    void delete_throwsAccessDeniedException_whenTicketBelongsToAnotherTourist() {
+        SupportTicket ticket = ticketRaisedBy(otherTourist, 13L);
+        when(repository.findById(13L)).thenReturn(Optional.of(ticket));
+
+        assertThatThrownBy(() -> service.delete(13L, auth))
+                .isInstanceOf(AccessDeniedException.class);
+        verify(repository, never()).delete(any());
+    }
+
+    @Test
+    void delete_throwsAccessDeniedException_whenOwnTicketIsNotOpen() {
+        SupportTicket ticket = ticketRaisedBy(tourist, 14L);
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
+        when(repository.findById(14L)).thenReturn(Optional.of(ticket));
+
+        assertThatThrownBy(() -> service.delete(14L, auth))
+                .isInstanceOf(AccessDeniedException.class);
+        verify(repository, never()).delete(any());
+    }
+
+    @Test
+    void delete_allowsStaffToDeleteAnyTicketRegardlessOfStatus() {
+        SupportTicket ticket = ticketRaisedBy(otherTourist, 15L);
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
+        when(repository.findById(15L)).thenReturn(Optional.of(ticket));
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_STAFF"))).when(auth).getAuthorities();
+
+        service.delete(15L, auth);
+
+        verify(repository).delete(ticket);
+    }
+
+    @Test
+    void delete_throwsResourceNotFoundException_whenTicketDoesNotExist() {
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.delete(99L, auth))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
     void updateStatus_doesNotCancelBooking_whenAlreadyCancelled() {
         Booking booking = Booking.builder().id(43L).status(BookingStatus.CANCELLED).build();
         SupportTicket ticket = ticketRaisedBy(tourist, 11L);

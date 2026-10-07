@@ -35,8 +35,22 @@ CREATE TABLE tour_packages (
     price DECIMAL(10,2) NOT NULL,
     max_participants INT DEFAULT 10,
     active BOOLEAN DEFAULT TRUE,
+    image_url VARCHAR(500),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (destination_id) REFERENCES destinations(id)
+);
+
+-- Photo galleries (@ElementCollection on Destination / TourPackage)
+CREATE TABLE destination_gallery (
+    destination_id BIGINT NOT NULL,
+    image_url VARCHAR(500),
+    FOREIGN KEY (destination_id) REFERENCES destinations(id) ON DELETE CASCADE
+);
+
+CREATE TABLE tour_package_gallery (
+    package_id BIGINT NOT NULL,
+    image_url VARCHAR(500),
+    FOREIGN KEY (package_id) REFERENCES tour_packages(id) ON DELETE CASCADE
 );
 
 CREATE TABLE tour_guides (
@@ -91,6 +105,22 @@ CREATE TABLE trip_plan_items (
     notes VARCHAR(500),
     FOREIGN KEY (trip_plan_id) REFERENCES trip_plans(id) ON DELETE CASCADE,
     FOREIGN KEY (destination_id) REFERENCES destinations(id)
+);
+
+CREATE TABLE guide_applications (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    applicant_id BIGINT NOT NULL,
+    languages VARCHAR(300),
+    skills VARCHAR(300),
+    certifications VARCHAR(300),
+    location VARCHAR(150),
+    years_experience INT,
+    message VARCHAR(1000),
+    status ENUM('PENDING','APPROVED','REJECTED') DEFAULT 'PENDING',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at DATETIME,
+    review_note VARCHAR(500),
+    FOREIGN KEY (applicant_id) REFERENCES users(id)
 );
 
 CREATE TABLE support_tickets (

@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { getTripPlan, updateTripPlan } from "../../api/tripPlanApi";
+import { getTripPlan, updateTripPlan, exportTripPlan } from "../../api/tripPlanApi";
 import { getDestinations } from "../../api/destinationApi";
 import "./tripplanner.css";
+
+/** Export formats offered by the backend export strategies (Strategy Pattern). */
+const EXPORT_FORMATS = [
+  { format: "text", extension: "txt", label: "📄 Text" },
+  { format: "csv", extension: "csv", label: "📊 CSV (Excel)" },
+  { format: "ics", extension: "ics", label: "📅 Calendar (.ics)" },
+];
 
 /**
  * TripEditor page — lets a tourist add, remove, and reorder day items
@@ -25,6 +32,7 @@ export default function TripEditor() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [exporting, setExporting] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -93,6 +101,27 @@ export default function TripEditor() {
       setError(err?.response?.data?.error || "Failed to save itinerary.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  /** Downloads the saved plan in the chosen format; the server picks the export strategy. */
+  async function handleExport({ format, extension }) {
+    setExporting(format);
+    setError("");
+    try {
+      const blob = await exportTripPlan(id, format);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `trip-plan-${id}.${extension}`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError("Failed to export trip plan.");
+    } finally {
+      setExporting("");
     }
   }
 
@@ -472,6 +501,43 @@ export default function TripEditor() {
           >
             {saving ? "Saving..." : "💾 Save Itinerary"}
           </button>
+        </div>
+
+        {/* Export / download */}
+        <div
+          style={{
+            marginTop: 24,
+            background: "#fff",
+            borderRadius: 12,
+            padding: "18px 20px",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+          }}
+        >
+          <div style={{ fontWeight: 700, color: "#0c1730", fontSize: 15 }}>Export itinerary</div>
+          <p style={{ color: "#6b7280", fontSize: 13, margin: "4px 0 12px" }}>
+            Downloads the last saved version of this plan. Save first if you made changes.
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {EXPORT_FORMATS.map((opt) => (
+              <button
+                key={opt.format}
+                onClick={() => handleExport(opt)}
+                disabled={exporting !== ""}
+                style={{
+                  background: "#fff",
+                  color: "#0c1730",
+                  border: "1.5px solid #d1d5db",
+                  borderRadius: 8,
+                  padding: "8px 16px",
+                  fontWeight: 600,
+                  cursor: exporting ? "not-allowed" : "pointer",
+                  fontSize: 13,
+                }}
+              >
+                {exporting === opt.format ? "Exporting..." : opt.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

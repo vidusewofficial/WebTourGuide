@@ -46,3 +46,16 @@ export const updateTripPlan = (id, data) =>
  */
 export const deleteTripPlan = (id) =>
   axiosClient.delete(`/trip-plans/${id}`);
+
+/**
+ * Downloads a plan as a file. `format` selects the backend export strategy
+ * (Strategy Pattern): "text" | "csv" | "ics".
+ * Fetched through axiosClient (not a plain link) so the Bearer token is sent.
+ * @param {number} id
+ * @param {"text"|"csv"|"ics"} format
+ * @returns {Promise<Blob>}
+ */
+export const exportTripPlan = (id, format) =>
+  axiosClient
+    .get(`/trip-plans/${id}/export`, { params: { format }, responseType: "blob" })
+    .then((r) => r.data);
